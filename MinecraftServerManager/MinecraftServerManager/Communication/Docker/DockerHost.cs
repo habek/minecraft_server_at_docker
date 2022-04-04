@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace MinecraftServerManager.Communication.Docker
 {
-	internal class DockerHost
+	public class DockerHost
 	{
 		DockerClient _client;
 		private IList<ContainerListResponse> _containers = new List<ContainerListResponse>();
+
+		public DockerClient DockerClient => _client;
 
 		public DockerHost(string uri)
 		{
@@ -34,19 +36,19 @@ namespace MinecraftServerManager.Communication.Docker
 
 		public void OnStdOut(string id, Action<string> action, CancellationToken cancellationToken)
 		{
-			_client.Containers.AttachContainerAsync(id, true, new ContainerAttachParameters { Stream = true, Stdout=true, Stderr=true }, cancellationToken).ContinueWith(async t =>
-			 {
-				 byte[] buffer = new byte[1024];
-				 var stream = await t;
-				 while (!cancellationToken.IsCancellationRequested)
+			_client.Containers.AttachContainerAsync(id, true, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true }, cancellationToken).ContinueWith(async t =>
 				 {
-					 var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken);
-					 if (readResult.Count > 0)
+					 byte[] buffer = new byte[1024];
+					 var stream = await t;
+					 while (!cancellationToken.IsCancellationRequested)
 					 {
-						 action(new string( Encoding.Default.GetString(buffer, 0, readResult.Count).Where(c=>c>=32).ToArray()));
+						 var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken);
+						 if (readResult.Count > 0)
+						 {
+							 action(new string(Encoding.Default.GetString(buffer, 0, readResult.Count).Where(c => c >= 32).ToArray()));
+						 }
 					 }
-				 }
-			 });
+				 });
 		}
 	}
 }

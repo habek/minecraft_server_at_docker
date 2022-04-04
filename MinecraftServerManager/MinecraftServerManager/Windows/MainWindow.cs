@@ -29,12 +29,23 @@ namespace MinecraftServerManager.Windows
 			foreach (var server in _serversManager.Servers)
 			{
 				lvServers.Items.Add(new ListViewItem { Text = server.ToString(), Tag = server });
+				server.OnLogAppend = (server, line) => Invoke(OnLogAppend, server, line);
 			}
+		}
+
+		private void OnLogAppend(MinecraftServer minecraftServer, string lineContent)
+		{
+			if (minecraftServer.Id != _selectedServerId)
+			{
+				return;
+			}
+			listBox1.Items.Add(lineContent);
+			listBox1.TopIndex = listBox1.Items.Count - 1;
 		}
 
 		private void lvServers_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(lvServers.SelectedItems.Count == 0)
+			if (lvServers.SelectedItems.Count == 0)
 			{
 				return;
 			}
@@ -48,7 +59,15 @@ namespace MinecraftServerManager.Windows
 				return;
 			}
 			_selectedServerId = minecraftServer.Id;
-			_serversManager.OnStdOut(_selectedServerId, (string stdOut) => Invoke(OnStdOut, stdOut));
+			listBox1.BeginUpdate();
+			listBox1.Items.Clear();
+			foreach (var line in minecraftServer.Logs)
+			{
+				listBox1.Items.Add(line);
+			}
+			listBox1.TopIndex = listBox1.Items.Count - 1;
+			listBox1.EndUpdate();
+			//_serversManager.OnStdOut(_selectedServerId, (string stdOut) => Invoke(OnStdOut, stdOut));
 		}
 		private void OnStdOut(string text)
 		{
