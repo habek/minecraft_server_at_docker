@@ -26,12 +26,8 @@ namespace MinecraftServerManager.Minecraft
 					{
 						//continue;
 					}
-					server = new MinecraftServer(_dockerHost, container.ID);
-					if(_minecraftServers.TryAdd(container.ID, server))
-					{
-						server.Connect(_cancellationToken);
-						server.RefreshState(container);
-					}
+					server = new MinecraftServer(_dockerHost, container);
+					_minecraftServers[container.ID] = server;
 				}
 			}
 		}

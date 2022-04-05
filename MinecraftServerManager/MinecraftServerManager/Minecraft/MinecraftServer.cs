@@ -15,12 +15,17 @@ namespace MinecraftServerManager.Minecraft
 		private readonly List<string> _logs = new List<string>();
 		MemoryStream _logBuffer = new MemoryStream();
 		private readonly DockerClient _dockerClient;
-		private readonly string _iD;
+		private readonly string _containerId;
 
-		public MinecraftServer(DockerHost dockerHost, string iD)
+		public MinecraftServer(DockerHost dockerHost, ContainerListResponse container)
 		{
 			_dockerClient = dockerHost.DockerClient;
-			_iD = iD;
+			_containerId = container.ID;
+			Name = container.Names.FirstOrDefault() ?? container.ID;
+			Id = container.ID;
+			State = container.State;
+			Status = container.Status;
+			_ = ConnectAsync(CancellationToken.None);
 		}
 
 		public string State { get; private set; } = "Unknown";
@@ -29,52 +34,44 @@ namespace MinecraftServerManager.Minecraft
 		public string Id { get; internal set; } = "Unknown";
 		public IEnumerable<object> Logs => _logs;
 		public Action<MinecraftServer, string>? OnLogAppend;
+		private bool _ttyEnabled;
 
 		public override string ToString()
 		{
 			return Name;
 		}
 
-		internal void RefreshState(ContainerListResponse container)
+		public async Task ConnectAsync(CancellationToken cancellationToken)
 		{
-			Name = container.Names.FirstOrDefault() ?? container.ID;
-			Id = container.ID;
-			State = container.State;
-			Status = container.Status;
-		}
+			var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
+			_ttyEnabled = inspectResponse.Config.Tty;
+			var stream = await _dockerClient.Containers.GetContainerLogsAsync(_containerId, _ttyEnabled, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, }, cancellationToken);
+			byte[] buffer = new byte[1024];
 
-		public void Connect(CancellationToken cancellationToken)
-		{
-			_dockerClient.Containers.GetContainerLogsAsync(_iD, true, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, }, cancellationToken).ContinueWith(async (t) =>
-			   {
-				   var stream = await t;
-				   byte[] buffer = new byte[1024];
-
-				   while (!cancellationToken.IsCancellationRequested)
-				   {
-					   try
-					   {
-						   var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
-						   if (readResult.Count > 0)
-						   {
-							   AppendDataToLog(buffer, readResult);
-						   }
-						   else
-						   {
-							   await Task.Delay(100, cancellationToken);
-						   }
-					   }
-					   catch (Exception ex)
-					   {
-						   Log.Error(ex.Message);
-					   }
-				   }
-			   });
+			while (!cancellationToken.IsCancellationRequested)
+			{
+				try
+				{
+					var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
+					if (readResult.Count > 0)
+					{
+						AppendDataToLog(buffer, readResult);
+					}
+					else
+					{
+						await Task.Delay(100, cancellationToken);
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex.Message);
+				}
+			}
 		}
 
 		public async Task SendCommand(string command, CancellationToken cancellationToken)
 		{
-			var stream = await _dockerClient.Containers.AttachContainerAsync(_iD, true, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationToken).ConfigureAwait(false);
+			var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationToken).ConfigureAwait(false);
 			try
 			{
 				byte[] buffer = new byte[1024];
