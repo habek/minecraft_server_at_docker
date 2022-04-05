@@ -6,14 +6,20 @@ using Serilog;
 
 public class Program
 {
-	//[STAThread]
+	[STAThread]
 	public static void Main(string[] args)
 	{
 		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 		var settingsPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath ?? Environment.CurrentDirectory)!, "Settings.json");
 		try
 		{
+			Log.Logger = new LoggerConfiguration()
+				.WriteTo.Console()
+				.WriteTo.File("logFile.log")
+				.WriteTo.Debug()
+				.CreateLogger();
 			Console.WriteLine("Welcome in Minecraft manager");
+			Log.Information("###### Start ######");
 			try
 			{
 				if (File.Exists(settingsPath))

@@ -15,9 +15,9 @@ namespace MinecraftServerManager.Windows
 			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.listBox1 = new System.Windows.Forms.ListBox();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.button1 = new System.Windows.Forms.Button();
+			this.btnSendCommand = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -40,22 +40,24 @@ namespace MinecraftServerManager.Windows
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.listBox1.FormattingEnabled = true;
+			this.listBox1.HorizontalScrollbar = true;
 			this.listBox1.ItemHeight = 15;
 			this.listBox1.Location = new System.Drawing.Point(225, 238);
 			this.listBox1.Name = "listBox1";
+			this.listBox1.ScrollAlwaysVisible = true;
 			this.listBox1.Size = new System.Drawing.Size(944, 514);
 			this.listBox1.TabIndex = 1;
 			// 
-			// comboBox1
+			// cmbCommandToSend
 			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Items.AddRange(new object[] {
+			this.cmbCommandToSend.FormattingEnabled = true;
+			this.cmbCommandToSend.Items.AddRange(new object[] {
             "gamerule",
             "list"});
-			this.comboBox1.Location = new System.Drawing.Point(416, 12);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(240, 23);
-			this.comboBox1.TabIndex = 2;
+			this.cmbCommandToSend.Location = new System.Drawing.Point(416, 12);
+			this.cmbCommandToSend.Name = "cmbCommandToSend";
+			this.cmbCommandToSend.Size = new System.Drawing.Size(240, 23);
+			this.cmbCommandToSend.TabIndex = 2;
 			// 
 			// label1
 			// 
@@ -66,21 +68,22 @@ namespace MinecraftServerManager.Windows
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Send command:";
 			// 
-			// button1
+			// btnSendCommand
 			// 
-			this.button1.Location = new System.Drawing.Point(674, 13);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 4;
-			this.button1.Text = "Send";
-			this.button1.UseVisualStyleBackColor = true;
+			this.btnSendCommand.Location = new System.Drawing.Point(674, 13);
+			this.btnSendCommand.Name = "btnSendCommand";
+			this.btnSendCommand.Size = new System.Drawing.Size(75, 23);
+			this.btnSendCommand.TabIndex = 4;
+			this.btnSendCommand.Text = "Send";
+			this.btnSendCommand.UseVisualStyleBackColor = true;
+			this.btnSendCommand.Click += new System.EventHandler(this.BtnSendCommand_Click);
 			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.btnSendCommand);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.comboBox1);
+			this.Controls.Add(this.cmbCommandToSend);
 			this.Controls.Add(this.listBox1);
 			this.Controls.Add(this.lvServers);
 			this.Name = "MainWindow";
@@ -91,8 +94,8 @@ namespace MinecraftServerManager.Windows
 		}
 
 		private ListBox listBox1;
-		private ComboBox comboBox1;
+		private ComboBox cmbCommandToSend;
 		private Label label1;
-		private Button button1;
+		private Button btnSendCommand;
 	}
 }

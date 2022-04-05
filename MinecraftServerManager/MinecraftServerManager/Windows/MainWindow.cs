@@ -10,7 +10,7 @@ namespace MinecraftServerManager.Windows
 	public partial class MainWindow : Form
 	{
 		private readonly ServersManager _serversManager;
-		private string? _selectedServerId;
+		private string? _currentServerId;
 
 		public MainWindow(ServersManager serversManager)
 		{
@@ -35,7 +35,7 @@ namespace MinecraftServerManager.Windows
 
 		private void OnLogAppend(MinecraftServer minecraftServer, string lineContent)
 		{
-			if (minecraftServer.Id != _selectedServerId)
+			if (minecraftServer.Id != _currentServerId)
 			{
 				return;
 			}
@@ -54,11 +54,11 @@ namespace MinecraftServerManager.Windows
 			{
 				return;
 			}
-			if (_selectedServerId == minecraftServer.Id)
+			if (_currentServerId == minecraftServer.Id)
 			{
 				return;
 			}
-			_selectedServerId = minecraftServer.Id;
+			_currentServerId = minecraftServer.Id;
 			listBox1.BeginUpdate();
 			listBox1.Items.Clear();
 			foreach (var line in minecraftServer.Logs)
@@ -76,6 +76,13 @@ namespace MinecraftServerManager.Windows
 			{
 				listBox1.Items.RemoveAt(0);
 			}
+		}
+
+		MinecraftServer? CurrentServer=>_serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
+
+		private void BtnSendCommand_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.SendCommand(cmbCommandToSend.Text+"\n", CancellationToken.None);
 		}
 	}
 }
