@@ -2,6 +2,8 @@
 using Docker.DotNet.Models;
 using MinecraftServerManager.Communication.Docker;
 using Serilog;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,7 +96,6 @@ namespace MinecraftServerManager.Minecraft
 			{
 				Log.Error(ex.Message);
 			}
-
 		}
 
 		private void AppendDataToLog(byte[] buffer, MultiplexedStream.ReadResult readResult)
@@ -125,6 +126,33 @@ namespace MinecraftServerManager.Minecraft
 					}
 				}
 			}
+		}
+
+		internal async Task<string> LoadPropertiesFile()
+		{
+			return Encoding.UTF8.GetString(await GetFile("/bedrock/server.properties")).ReplaceLineEndings();
+		}
+		
+		internal async Task<byte[]> GetFile(string filePathOnContainer)
+		{
+			GetArchiveFromContainerParameters parameters = new GetArchiveFromContainerParameters { Path = filePathOnContainer };
+			var response = await _dockerClient.Containers.GetArchiveFromContainerAsync(_containerId, parameters, false);
+			var reader = ReaderFactory.Open(response.Stream);
+			while (reader.MoveToNextEntry())
+			{
+				if (!reader.Entry.IsDirectory)
+				{
+					ExtractionOptions opt = new ExtractionOptions
+					{
+						ExtractFullPath = true,
+						Overwrite = true
+					};
+					var memoryStream = new MemoryStream();
+					reader.WriteEntryTo(memoryStream);
+					return memoryStream.ToArray();
+				}
+			}
+			throw new FileNotFoundException(parameters.Path);
 		}
 	}
 }

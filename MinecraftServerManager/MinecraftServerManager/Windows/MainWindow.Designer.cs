@@ -18,6 +18,7 @@ namespace MinecraftServerManager.Windows
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.btnSendCommand = new System.Windows.Forms.Button();
+			this.btnOpenProperties = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -78,9 +79,20 @@ namespace MinecraftServerManager.Windows
 			this.btnSendCommand.UseVisualStyleBackColor = true;
 			this.btnSendCommand.Click += new System.EventHandler(this.BtnSendCommand_Click);
 			// 
+			// btnOpenProperties
+			// 
+			this.btnOpenProperties.Location = new System.Drawing.Point(1094, 15);
+			this.btnOpenProperties.Name = "btnOpenProperties";
+			this.btnOpenProperties.Size = new System.Drawing.Size(75, 23);
+			this.btnOpenProperties.TabIndex = 5;
+			this.btnOpenProperties.Text = "Edit properties";
+			this.btnOpenProperties.UseVisualStyleBackColor = true;
+			this.btnOpenProperties.Click += new System.EventHandler(this.btnOpenProperties_Click);
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnOpenProperties);
 			this.Controls.Add(this.btnSendCommand);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.cmbCommandToSend);
@@ -97,5 +109,6 @@ namespace MinecraftServerManager.Windows
 		private ComboBox cmbCommandToSend;
 		private Label label1;
 		private Button btnSendCommand;
+		private Button btnOpenProperties;
 	}
 }

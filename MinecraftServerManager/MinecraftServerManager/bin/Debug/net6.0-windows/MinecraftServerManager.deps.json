@@ -12,7 +12,8 @@
           "Serilog": "2.10.0",
           "Serilog.Sinks.Console": "4.0.1",
           "Serilog.Sinks.Debug": "2.0.0",
-          "Serilog.Sinks.File": "5.0.0"
+          "Serilog.Sinks.File": "5.0.0",
+          "SharpCompress": "0.31.0"
         },
         "runtime": {
           "MinecraftServerManager.dll": {}
@@ -80,6 +81,14 @@
           }
         }
       },
+      "SharpCompress/0.31.0": {
+        "runtime": {
+          "lib/net5.0/SharpCompress.dll": {
+            "assemblyVersion": "0.31.0.0",
+            "fileVersion": "0.31.0.0"
+          }
+        }
+      },
       "System.Buffers/4.5.1": {},
       "System.Threading.Tasks.Extensions/4.5.4": {}
     }
@@ -131,6 +140,13 @@
       "sha512": "sha512-uwV5hdhWPwUH1szhO8PJpFiahqXmzPzJT/sOijH/kFgUx+cyoDTMM8MHD0adw9+Iem6itoibbUXHYslzXsLEAg==",
       "path": "serilog.sinks.file/5.0.0",
       "hashPath": "serilog.sinks.file.5.0.0.nupkg.sha512"
+    },
+    "SharpCompress/0.31.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wFf5N0ysnlKbG54beDDm4Z1uqM0EAKTupEkTxyG4EGVE1uZgTtohuBd2BhTHR2gNweJ6agxKbMFzmzk181qqjw==",
+      "path": "sharpcompress/0.31.0",
+      "hashPath": "sharpcompress.0.31.0.nupkg.sha512"
     },
     "System.Buffers/4.5.1": {
       "type": "package",
