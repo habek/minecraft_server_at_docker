@@ -1,0 +1,111 @@
+version: '3'
+services:
+  oneblock_80:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./oneblock_80:/bedrock
+      - /media/u/Backup/Minecraft/dockers/oneblock_80:/backups
+    # ports:
+      # - 19132:19132/udp
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.80
+
+  survival_81:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./survival_81:/bedrock
+      - /media/u/Backup/Minecraft/dockers/survival_81:/backups
+    # ports:
+      # - 19132:19132/udp
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.81
+
+  creative_82:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./creative_82:/bedrock
+      - /media/u/Backup/Minecraft/dockers/creative_82:/backups
+    # ports:
+      # - 19132:19132/udp
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.82
+
+  creative_83:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./creative_83:/bedrock
+      - /media/u/Backup/Minecraft/dockers/creative_83:/backups
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.83
+
+  creative_84:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./creative_84:/bedrock
+      - /media/u/Backup/Minecraft/dockers/creative_84:/backups
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.84
+
+  85_test:
+    restart: always
+    image: habek/minecraft_server_at_docker:${HABEK_VERSION:-latest}
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./85_test:/bedrock
+      - /media/u/Backup/Minecraft/dockers/85_test:/backups
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.85
+
+  86_mesa_plateau:
+    restart: always
+    image: tchorwat/bedrock-in-docker:0.1.1
+    environment:
+      - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
+      - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
+    volumes:
+      - ./86_mesa_plateau:/bedrock
+      - /media/u/Backup/Minecraft/dockers/86_mesa_plateau:/backups
+    networks:
+      minecraft:
+        ipv4_address: 192.168.200.86
+
+
+
+networks:
+  minecraft:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: "192.168.200.0/23"
+          # ip_range: "192.168.200.64/26"
+          gateway: "192.168.201.28"
+

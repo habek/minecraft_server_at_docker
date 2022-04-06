@@ -85,15 +85,20 @@ namespace MinecraftServerManager.Windows
 			CurrentServer?.SendCommand(cmbCommandToSend.Text+"\n", CancellationToken.None);
 		}
 
-		private void btnOpenProperties_Click(object sender, EventArgs e)
+		private void BtnOpenProperties_Click(object sender, EventArgs e)
 		{
-			var minecraftManager = CurrentServer;
-			if(minecraftManager == null)
+			var minecraftServer = CurrentServer;
+			if(minecraftServer == null)
 			{
 				return;
 			}
-			var window = new PropertiesFileEditor(minecraftManager);
+			var window = new PropertiesFileEditor(minecraftServer);
 			window.Show(this);
+		}
+
+		private void BtnRestart_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.Restart();
 		}
 	}
 }

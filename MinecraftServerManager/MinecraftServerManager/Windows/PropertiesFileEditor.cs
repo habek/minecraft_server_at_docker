@@ -28,5 +28,10 @@ namespace MinecraftServerManager.Windows
 			var fileContent = await _minecraftServer.LoadPropertiesFile();
 			Invoke(() => textBox1.Text = fileContent);
 		}
+
+		private async void btnSave_Click(object sender, EventArgs e)
+		{
+			await _minecraftServer.SavePropertiesFile(textBox1.Text);
+		}
 	}
 }

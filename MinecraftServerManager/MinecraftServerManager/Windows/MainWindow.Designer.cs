@@ -19,6 +19,7 @@ namespace MinecraftServerManager.Windows
 			this.label1 = new System.Windows.Forms.Label();
 			this.btnSendCommand = new System.Windows.Forms.Button();
 			this.btnOpenProperties = new System.Windows.Forms.Button();
+			this.btnRestart = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -87,11 +88,22 @@ namespace MinecraftServerManager.Windows
 			this.btnOpenProperties.TabIndex = 5;
 			this.btnOpenProperties.Text = "Edit properties";
 			this.btnOpenProperties.UseVisualStyleBackColor = true;
-			this.btnOpenProperties.Click += new System.EventHandler(this.btnOpenProperties_Click);
+			this.btnOpenProperties.Click += new System.EventHandler(this.BtnOpenProperties_Click);
+			// 
+			// btnRestart
+			// 
+			this.btnRestart.Location = new System.Drawing.Point(1094, 44);
+			this.btnRestart.Name = "btnRestart";
+			this.btnRestart.Size = new System.Drawing.Size(75, 23);
+			this.btnRestart.TabIndex = 6;
+			this.btnRestart.Text = "Restart";
+			this.btnRestart.UseVisualStyleBackColor = true;
+			this.btnRestart.Click += new System.EventHandler(this.BtnRestart_Click);
 			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnRestart);
 			this.Controls.Add(this.btnOpenProperties);
 			this.Controls.Add(this.btnSendCommand);
 			this.Controls.Add(this.label1);
@@ -110,5 +122,6 @@ namespace MinecraftServerManager.Windows
 		private Label label1;
 		private Button btnSendCommand;
 		private Button btnOpenProperties;
+		private Button btnRestart;
 	}
 }

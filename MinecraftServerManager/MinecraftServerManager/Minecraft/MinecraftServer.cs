@@ -2,8 +2,10 @@
 using Docker.DotNet.Models;
 using MinecraftServerManager.Communication.Docker;
 using Serilog;
+using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
 using SharpCompress.Readers;
+using SharpCompress.Writers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,7 @@ namespace MinecraftServerManager.Minecraft
 {
 	public class MinecraftServer
 	{
+		private const string PropertiesPathOnContainer = "/bedrock/server.properties";
 		private readonly List<string> _logs = new List<string>();
 		MemoryStream _logBuffer = new MemoryStream();
 		private readonly DockerClient _dockerClient;
@@ -63,6 +66,10 @@ namespace MinecraftServerManager.Minecraft
 					{
 						await Task.Delay(100, cancellationToken);
 					}
+					//if (readResult.EOF)
+					//{
+					//	return;
+					//}
 				}
 				catch (Exception ex)
 				{
@@ -130,9 +137,26 @@ namespace MinecraftServerManager.Minecraft
 
 		internal async Task<string> LoadPropertiesFile()
 		{
-			return Encoding.UTF8.GetString(await GetFile("/bedrock/server.properties")).ReplaceLineEndings();
+			return Encoding.UTF8.GetString(await GetFile(PropertiesPathOnContainer)).ReplaceLineEndings();
 		}
-		
+
+		internal async Task SavePropertiesFile(string text)
+		{
+			var content = text.ReplaceLineEndings("\n");
+			await SaveFile(PropertiesPathOnContainer, Encoding.UTF8.GetBytes(content));
+		}
+
+		private async Task SaveFile(string filePathOnContainer, byte[] content)
+		{
+			var tarStream = new MemoryStream();
+			using (var writer = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.None))
+			{
+				writer.Write(Path.GetFileName(filePathOnContainer), new MemoryStream(content));
+			}
+			tarStream.Position = 0;
+			await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = Path.GetDirectoryName(filePathOnContainer).Replace(Path.DirectorySeparatorChar, '/') }, tarStream);
+		}
+
 		internal async Task<byte[]> GetFile(string filePathOnContainer)
 		{
 			GetArchiveFromContainerParameters parameters = new GetArchiveFromContainerParameters { Path = filePathOnContainer };
@@ -142,17 +166,17 @@ namespace MinecraftServerManager.Minecraft
 			{
 				if (!reader.Entry.IsDirectory)
 				{
-					ExtractionOptions opt = new ExtractionOptions
-					{
-						ExtractFullPath = true,
-						Overwrite = true
-					};
 					var memoryStream = new MemoryStream();
 					reader.WriteEntryTo(memoryStream);
 					return memoryStream.ToArray();
 				}
 			}
 			throw new FileNotFoundException(parameters.Path);
+		}
+
+		public async Task Restart()
+		{
+			await _dockerClient.Containers.RestartContainerAsync(_containerId, new ContainerRestartParameters ());
 		}
 	}
 }
