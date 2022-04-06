@@ -154,7 +154,7 @@ namespace MinecraftServerManager.Minecraft
 				writer.Write(Path.GetFileName(filePathOnContainer), new MemoryStream(content));
 			}
 			tarStream.Position = 0;
-			await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = Path.GetDirectoryName(filePathOnContainer).Replace(Path.DirectorySeparatorChar, '/') }, tarStream);
+			await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = Path.GetDirectoryName(filePathOnContainer)?.Replace(Path.DirectorySeparatorChar, '/') }, tarStream);
 		}
 
 		internal async Task<byte[]> GetFile(string filePathOnContainer)
@@ -176,7 +176,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task Restart()
 		{
-			await _dockerClient.Containers.RestartContainerAsync(_containerId, new ContainerRestartParameters ());
+			await _dockerClient.Containers.RestartContainerAsync(_containerId, new ContainerRestartParameters());
 		}
 	}
 }

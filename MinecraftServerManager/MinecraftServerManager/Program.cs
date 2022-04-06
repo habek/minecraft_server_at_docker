@@ -43,7 +43,7 @@ public class Program
 		{
 			try
 			{
-				File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings));
+				File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings, Formatting.Indented));
 			}
 			catch (Exception ex)
 			{
@@ -58,5 +58,5 @@ public class Program
 		Log.Error("Unhandled exception: " + e.ExceptionObject);
 		Log.CloseAndFlush();
 	}
-	static SettingsModel Settings { get; set; } = new SettingsModel();
+	public static SettingsModel Settings { get; set; } = new SettingsModel();
 }

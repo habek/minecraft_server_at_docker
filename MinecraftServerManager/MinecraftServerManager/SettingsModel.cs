@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace MinecraftServerManager
 {
-	internal class SettingsModel
+	public class SettingsModel
 	{
+		private const string _notSet = "";
+
+		public string DockerHost { get; set; } = _notSet;
 	}
 }

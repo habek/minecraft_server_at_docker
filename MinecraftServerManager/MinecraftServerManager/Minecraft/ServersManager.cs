@@ -11,7 +11,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public ServersManager(CancellationToken cancellationToken)
 		{
-			_dockerHost = new DockerHost("tcp://192.168.200.11:2375");
+			_dockerHost = new DockerHost($"tcp://{Program.Settings.DockerHost}:2375");
 			_cancellationToken = cancellationToken;
 		}
 
