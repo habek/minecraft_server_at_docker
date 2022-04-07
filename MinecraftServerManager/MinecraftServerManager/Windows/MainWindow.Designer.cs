@@ -13,6 +13,7 @@ namespace MinecraftServerManager.Windows
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("itema");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
@@ -20,6 +21,8 @@ namespace MinecraftServerManager.Windows
 			this.btnSendCommand = new System.Windows.Forms.Button();
 			this.btnOpenProperties = new System.Windows.Forms.Button();
 			this.btnRestart = new System.Windows.Forms.Button();
+			this.btnListUsers = new System.Windows.Forms.Button();
+			this.lvUsers = new System.Windows.Forms.ListView();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -100,9 +103,34 @@ namespace MinecraftServerManager.Windows
 			this.btnRestart.UseVisualStyleBackColor = true;
 			this.btnRestart.Click += new System.EventHandler(this.BtnRestart_Click);
 			// 
+			// btnListUsers
+			// 
+			this.btnListUsers.Location = new System.Drawing.Point(674, 44);
+			this.btnListUsers.Name = "btnListUsers";
+			this.btnListUsers.Size = new System.Drawing.Size(75, 23);
+			this.btnListUsers.TabIndex = 7;
+			this.btnListUsers.Text = "List users";
+			this.btnListUsers.UseVisualStyleBackColor = true;
+			this.btnListUsers.Click += new System.EventHandler(this.btnListUsers_Click);
+			// 
+			// lvUsers
+			// 
+			this.lvUsers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem2});
+			this.lvUsers.Location = new System.Drawing.Point(225, 131);
+			this.lvUsers.Name = "lvUsers";
+			this.lvUsers.Size = new System.Drawing.Size(944, 101);
+			this.lvUsers.TabIndex = 8;
+			this.lvUsers.UseCompatibleStateImageBehavior = false;
+			this.lvUsers.View = System.Windows.Forms.View.List;
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.lvUsers);
+			this.Controls.Add(this.btnListUsers);
 			this.Controls.Add(this.btnRestart);
 			this.Controls.Add(this.btnOpenProperties);
 			this.Controls.Add(this.btnSendCommand);
@@ -123,5 +151,7 @@ namespace MinecraftServerManager.Windows
 		private Button btnSendCommand;
 		private Button btnOpenProperties;
 		private Button btnRestart;
+		private Button btnListUsers;
+		private ListView lvUsers;
 	}
 }

@@ -43,6 +43,8 @@ public class Program
 		{
 			try
 			{
+				Settings.KnownUsers.Clear();
+				Settings.KnownUsers.AddRange(MinecraftUsersManager.Instance.GetAllUsers());
 				File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings, Formatting.Indented));
 			}
 			catch (Exception ex)

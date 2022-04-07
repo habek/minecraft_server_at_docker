@@ -1,0 +1,77 @@
+﻿using Docker.DotNet;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MinecraftServerManager.Minecraft
+{
+	public class CommandStream : IDisposable
+	{
+		CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private MultiplexedStream _stream;
+		private MemoryStream _stdin;
+		private MemoryStream _stdout;
+		private MemoryStream _stderr;
+		int _readPosition;
+
+		public CommandStream(MultiplexedStream stream)
+		{
+			_stream = stream;
+			_stdin = new MemoryStream();
+			_stdout = new MemoryStream();
+			_stderr = new MemoryStream();
+			//Task.Run(async () =>
+			//{
+			//	await _stream.CopyOutputToAsync(_stdin, _stdout, _stderr, _cancellationTokenSource.Token);
+			//});
+		}
+
+
+		public void Dispose()
+		{
+			_cancellationTokenSource.Cancel();
+			_stream.Dispose();
+		}
+
+		internal async Task WriteLine(string line)
+		{
+			var buffer = Encoding.UTF8.GetBytes(line + MinecraftServer.LineSeparator);
+			await _stream.WriteAsync(buffer, 0, buffer.Length, _cancellationTokenSource.Token);
+		}
+
+		internal async Task<string> ReadLine()
+		{
+			var start = _readPosition;
+			var buffer = new byte[1024];
+			bool lineEndFound = false;
+			while (!lineEndFound)
+			{
+				if (_readPosition >= _stdout.Length)
+				{
+					var readResult = await _stream.ReadOutputAsync(buffer, 0, buffer.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
+					if (readResult.EOF)
+					{
+						break;
+					}
+					_stdout.Write(buffer, 0, readResult.Count);
+				}
+				while (_readPosition < _stdout.Length)
+				{
+					if (_stdout.GetBuffer()[_readPosition++] == '\n')
+					{
+						lineEndFound = true;
+						break;
+					}
+				}
+			}
+			if (_readPosition == start)
+			{
+				return "";
+			}
+			var line = Encoding.UTF8.GetString(_stdout.GetBuffer().AsSpan().Slice(start, _readPosition - start)).TrimEnd();
+			return line;
+		}
+	}
+}

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MinecraftServerManager.Minecraft.MinecraftServer;
 
 namespace MinecraftServerManager.Windows
 {
@@ -29,8 +30,51 @@ namespace MinecraftServerManager.Windows
 			foreach (var server in _serversManager.Servers)
 			{
 				lvServers.Items.Add(new ListViewItem { Text = server.ToString(), Tag = server });
-				server.OnLogAppend = (server, line) => Invoke(OnLogAppend, server, line);
+				server.OnLogAppend = (server, line) =>
+				{
+					if (!IsDisposed) return;
+					Invoke(OnLogAppend, server, line);
+				};
+				server.OnDataChanged = (server, changedData) =>
+				{
+					if (IsDisposed) return;
+					Invoke(OnDataChanged, server, changedData);
+				};
 			}
+			if (lvServers.Items.Count > 0)
+			{
+				if (lvServers.SelectedItems.Count == 0)
+				{
+					lvServers.Items[0].Selected = true;
+				}
+			}
+		}
+
+		private void OnDataChanged(MinecraftServer minecraftServer, ChangedData changedData)
+		{
+			if (minecraftServer.Id != _currentServerId)
+			{
+				return;
+			}
+			switch (changedData)
+			{
+				case ChangedData.Users: UpdateUserList(minecraftServer); break;
+			}
+		}
+
+		private void UpdateUserList(MinecraftServer minecraftServer)
+		{
+			lvUsers.BeginUpdate();
+			lvUsers.Items.Clear();
+			foreach (var user in minecraftServer.ConnectedUsers)
+			{
+				var item = new ListViewItem(user.ToString())
+				{
+					Tag = user
+				};
+				lvUsers.Items.Add(item);
+			}
+			lvUsers.EndUpdate();
 		}
 
 		private void OnLogAppend(MinecraftServer minecraftServer, string lineContent)
@@ -58,7 +102,10 @@ namespace MinecraftServerManager.Windows
 			{
 				return;
 			}
+
 			_currentServerId = minecraftServer.Id;
+
+			UpdateUserList(minecraftServer);
 			listBox1.BeginUpdate();
 			listBox1.Items.Clear();
 			foreach (var line in minecraftServer.Logs)
@@ -67,28 +114,19 @@ namespace MinecraftServerManager.Windows
 			}
 			listBox1.TopIndex = listBox1.Items.Count - 1;
 			listBox1.EndUpdate();
-			//_serversManager.OnStdOut(_selectedServerId, (string stdOut) => Invoke(OnStdOut, stdOut));
-		}
-		private void OnStdOut(string text)
-		{
-			listBox1.Items.Add(text);
-			if (listBox1.Items.Count > 1000)
-			{
-				listBox1.Items.RemoveAt(0);
-			}
 		}
 
-		MinecraftServer? CurrentServer=>_serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
+		MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
 
 		private void BtnSendCommand_Click(object sender, EventArgs e)
 		{
-			CurrentServer?.SendCommand(cmbCommandToSend.Text+"\n", CancellationToken.None);
+			CurrentServer?.SendCommand(cmbCommandToSend.Text + "\n", CancellationToken.None);
 		}
 
 		private void BtnOpenProperties_Click(object sender, EventArgs e)
 		{
 			var minecraftServer = CurrentServer;
-			if(minecraftServer == null)
+			if (minecraftServer == null)
 			{
 				return;
 			}
@@ -99,6 +137,11 @@ namespace MinecraftServerManager.Windows
 		private void BtnRestart_Click(object sender, EventArgs e)
 		{
 			CurrentServer?.Restart();
+		}
+
+		private void btnListUsers_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.UpdateUsersList();
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinecraftServerManager.Minecraft;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,7 @@ namespace MinecraftServerManager
 		private const string _notSet = "";
 
 		public string DockerHost { get; set; } = _notSet;
+
+		public List<XboxUser> KnownUsers { get; } = new List<XboxUser>();
 	}
 }

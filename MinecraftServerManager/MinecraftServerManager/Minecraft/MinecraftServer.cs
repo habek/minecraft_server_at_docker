@@ -7,6 +7,7 @@ using SharpCompress.Common;
 using SharpCompress.Readers;
 using SharpCompress.Writers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,9 @@ namespace MinecraftServerManager.Minecraft
 		MemoryStream _logBuffer = new MemoryStream();
 		private readonly DockerClient _dockerClient;
 		private readonly string _containerId;
+		private readonly MinecraftUsersManager _minecraftUsersManager;
 
-		public MinecraftServer(DockerHost dockerHost, ContainerListResponse container)
+		public MinecraftServer(MinecraftUsersManager minecraftUsersManager, DockerHost dockerHost, ContainerListResponse container)
 		{
 			_dockerClient = dockerHost.DockerClient;
 			_containerId = container.ID;
@@ -31,6 +33,7 @@ namespace MinecraftServerManager.Minecraft
 			State = container.State;
 			Status = container.Status;
 			_ = ConnectAsync(CancellationToken.None);
+			_minecraftUsersManager = minecraftUsersManager;
 		}
 
 		public string State { get; private set; } = "Unknown";
@@ -38,44 +41,68 @@ namespace MinecraftServerManager.Minecraft
 		public string Name { get; private set; } = "Unknown";
 		public string Id { get; internal set; } = "Unknown";
 		public IEnumerable<object> Logs => _logs;
+		private ConcurrentDictionary<string, XboxUser> _connectedUsers = new();
+
+		public static string LineSeparator { get => "\n"; }
+
+
+		public enum ChangedData { Users }
+		public Action<MinecraftServer, ChangedData>? OnDataChanged;
 		public Action<MinecraftServer, string>? OnLogAppend;
 		private bool _ttyEnabled;
+		private string? _timestamp;
 
 		public override string ToString()
 		{
 			return Name;
 		}
 
+		public IReadOnlyList<XboxUser> ConnectedUsers => _connectedUsers.Values.ToList();
+
 		public async Task ConnectAsync(CancellationToken cancellationToken)
 		{
-			var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
-			_ttyEnabled = inspectResponse.Config.Tty;
-			var stream = await _dockerClient.Containers.GetContainerLogsAsync(_containerId, _ttyEnabled, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, }, cancellationToken);
-			byte[] buffer = new byte[1024];
-
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				try
 				{
-					var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
-					if (readResult.Count > 0)
+					var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
+					_ttyEnabled = inspectResponse.Config.Tty;
+					string? since = null;
+					if (_timestamp != null)
 					{
-						AppendDataToLog(buffer, readResult);
+						var linuxTimestamp = DateTimeOffset.Parse(_timestamp);
+						since = linuxTimestamp.ToUnixTimeSeconds().ToString();
 					}
-					else
+					var stream = await _dockerClient.Containers.GetContainerLogsAsync(_containerId, _ttyEnabled, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, Since = since }, cancellationToken);
+					byte[] buffer = new byte[1024];
+
+					while (!cancellationToken.IsCancellationRequested)
 					{
-						await Task.Delay(100, cancellationToken);
+						var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
+						if (readResult.Count > 0)
+						{
+							AppendDataToLog(buffer, readResult);
+						}
+						else
+						{
+							await Task.Delay(100, cancellationToken);
+						}
+						if (readResult.EOF)
+						{
+							break;
+						}
 					}
-					//if (readResult.EOF)
-					//{
-					//	return;
-					//}
 				}
 				catch (Exception ex)
 				{
 					Log.Error(ex.Message);
 				}
 			}
+		}
+
+		private async Task UpdateAllData()
+		{
+			await UpdateUsersList();
 		}
 
 		public async Task SendCommand(string command, CancellationToken cancellationToken)
@@ -105,6 +132,56 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
+		public async Task<CommandStream> Attach()
+		{
+			CancellationTokenSource cancellationTokenSource = new();
+			cancellationTokenSource.CancelAfter(5000);
+			var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationTokenSource.Token).ConfigureAwait(false);
+			return new CommandStream(stream);
+		}
+
+		public async Task UpdateUsersList()
+		{
+			try
+			{
+				var users = new List<XboxUser>();
+				using (var stream = await Attach())
+				{
+					await stream.WriteLine("list");
+					var line = await stream.ReadLine();
+					if (line != "list")
+					{
+						throw new Exception("List users failure");
+					}
+					line = await stream.ReadLine();
+					if (ConsoleDataParser.IsOnlineInformationDataParsed(line, out int _numberOfPlayers, out int _maxNumberOfPlayers))
+					{
+						for (int i = 0; i < _numberOfPlayers; i++)
+						{
+							var userName = await stream.ReadLine();
+							users.Add(_minecraftUsersManager.GetXboxUser(userName));
+						}
+					}
+				}
+				foreach (var userName in _connectedUsers.Keys)
+				{
+					if (!users.Any(u => u.UserName == userName))
+					{
+						_connectedUsers.TryRemove(userName, out _);
+					}
+				}
+				foreach (var user in users)
+				{
+					_connectedUsers[user.UserName] = user;
+				}
+				OnDataChanged?.Invoke(this, ChangedData.Users);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Error listing users");
+			}
+		}
+
 		private void AppendDataToLog(byte[] buffer, MultiplexedStream.ReadResult readResult)
 		{
 			lock (_logBuffer)
@@ -116,22 +193,48 @@ namespace MinecraftServerManager.Minecraft
 					{
 						var line = Encoding.UTF8.GetString(_logBuffer.ToArray());
 						_logs.Add(line);
-						if (OnLogAppend != null)
+						if (line.Length > 30)
 						{
-							OnLogAppend(this, line);
+							_timestamp = line.Substring(0, 30);
 						}
-						if (_logs.Count > 10000)
-						{
-							_logs.RemoveRange(0, _logs.Count - 10000);
-						}
+						AppendLineToLog(line);
 						_logBuffer.Position = 0;
 						_logBuffer.SetLength(0);
 					}
-					else
+					else if (c != '\r')
 					{
 						_logBuffer.WriteByte(c);
 					}
 				}
+			}
+		}
+
+		private void AppendActionLineToLog(string message)
+		{
+			AppendLineToLog($"**** {message} ****");
+		}
+
+		private void AppendLineToLog(string line)
+		{
+			if (line.EndsWith("Server started."))
+			{
+				_ = UpdateAllData();
+			}
+			else if (ConsoleDataParser.IsUserInformation(line, out string? userName, out string? xuid) && !string.IsNullOrEmpty(xuid) && !string.IsNullOrEmpty(userName))
+			{
+				bool userChanged = _minecraftUsersManager.UpdateUser(userName, xuid);
+				if (_connectedUsers.TryAdd(userName, _minecraftUsersManager.GetXboxUser(userName)) || userChanged)
+				{
+					OnDataChanged?.Invoke(this, ChangedData.Users);
+				}
+			}
+			if (OnLogAppend != null)
+			{
+				OnLogAppend(this, line);
+			}
+			if (_logs.Count > 10000)
+			{
+				_logs.RemoveRange(0, _logs.Count - 10000);
 			}
 		}
 
@@ -142,7 +245,7 @@ namespace MinecraftServerManager.Minecraft
 
 		internal async Task SavePropertiesFile(string text)
 		{
-			var content = text.ReplaceLineEndings("\n");
+			var content = text.ReplaceLineEndings(LineSeparator);
 			await SaveFile(PropertiesPathOnContainer, Encoding.UTF8.GetBytes(content));
 		}
 
@@ -176,7 +279,9 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task Restart()
 		{
+			AppendActionLineToLog("Restarting...");
 			await _dockerClient.Containers.RestartContainerAsync(_containerId, new ContainerRestartParameters());
+			AppendActionLineToLog("Restarted");
 		}
 	}
 }

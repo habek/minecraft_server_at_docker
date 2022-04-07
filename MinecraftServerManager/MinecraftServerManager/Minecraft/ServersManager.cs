@@ -26,7 +26,7 @@ namespace MinecraftServerManager.Minecraft
 					{
 						//continue;
 					}
-					server = new MinecraftServer(_dockerHost, container);
+					server = new MinecraftServer(MinecraftUsersManager.Instance, _dockerHost, container);
 					_minecraftServers[container.ID] = server;
 				}
 			}
