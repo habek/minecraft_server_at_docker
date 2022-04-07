@@ -1,6 +1,8 @@
 ﻿using Docker.DotNet;
 using Docker.DotNet.Models;
 using MinecraftServerManager.Communication.Docker;
+using MinecraftServerManager.Minecraft.Users;
+using Newtonsoft.Json;
 using Serilog;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
@@ -20,9 +22,11 @@ namespace MinecraftServerManager.Minecraft
 		public const string PropertiesPathOnContainer = "/bedrock/server.properties";
 		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
 		private readonly List<string> _logs = new List<string>();
-		MemoryStream _logBuffer = new MemoryStream();
+		private readonly MemoryStream _logBuffer = new MemoryStream();
+		private ConcurrentDictionary<string, MinecraftUser> _connectedUsers = new();
 		private readonly DockerClient _dockerClient;
 		private readonly string _containerId;
+		private readonly ConcurrentDictionary<string, Permission> _permissions = new ConcurrentDictionary<string, Permission>();
 
 		private readonly MinecraftUsersManager _minecraftUsersManager;
 
@@ -43,7 +47,6 @@ namespace MinecraftServerManager.Minecraft
 		public string Name { get; private set; } = "Unknown";
 		public string Id { get; internal set; } = "Unknown";
 		public IEnumerable<object> Logs => _logs;
-		private ConcurrentDictionary<string, XboxUser> _connectedUsers = new();
 
 		public static string LineSeparator { get => "\n"; }
 
@@ -51,6 +54,7 @@ namespace MinecraftServerManager.Minecraft
 		public enum ChangedData { Users }
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
 		public Action<MinecraftServer, string>? OnLogAppend;
+
 		private bool _ttyEnabled;
 		private string? _timestamp;
 
@@ -59,7 +63,7 @@ namespace MinecraftServerManager.Minecraft
 			return Name;
 		}
 
-		public IReadOnlyList<XboxUser> ConnectedUsers => _connectedUsers.Values.ToList();
+		public IReadOnlyList<MinecraftUser> ConnectedUsers => _connectedUsers.Values.ToList();
 
 		public async Task ConnectAsync(CancellationToken cancellationToken)
 		{
@@ -105,6 +109,7 @@ namespace MinecraftServerManager.Minecraft
 		private async Task UpdateAllData()
 		{
 			await UpdateUsersList();
+			await UpdatePermissions();
 		}
 
 		public async Task SendCommand(string command, CancellationToken cancellationToken)
@@ -134,6 +139,35 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
+		internal Permission? GetUserPermission(MinecraftUser user)
+		{
+			if (_permissions.TryGetValue(user.Xuid, out Permission? permission))
+			{
+				return permission;
+			}
+			return null;
+		}
+
+		public async Task UpdatePermissions()
+		{
+			try
+			{
+				var json = await LoadTextFile(PermissionsPathOnContainer);
+				var permissions = JsonConvert.DeserializeObject<List<Permission>>(json);
+				foreach (var permission in permissions)
+				{
+					if (permission.Xuid != null)
+					{
+						_permissions[permission.Xuid] = permission;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Updating permissions error");
+			}
+		}
+
 		public async Task<CommandStream> Attach()
 		{
 			CancellationTokenSource cancellationTokenSource = new();
@@ -146,7 +180,7 @@ namespace MinecraftServerManager.Minecraft
 		{
 			try
 			{
-				var users = new List<XboxUser>();
+				var users = new List<MinecraftUser>();
 				using (var stream = await Attach())
 				{
 					await stream.WriteLine("list");

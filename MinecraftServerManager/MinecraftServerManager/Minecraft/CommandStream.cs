@@ -9,12 +9,12 @@ namespace MinecraftServerManager.Minecraft
 {
 	public class CommandStream : IDisposable
 	{
-		CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 		private MultiplexedStream _stream;
 		private MemoryStream _stdin;
 		private MemoryStream _stdout;
 		private MemoryStream _stderr;
-		int _readPosition;
+		private int _readPosition;
 
 		public CommandStream(MultiplexedStream stream)
 		{

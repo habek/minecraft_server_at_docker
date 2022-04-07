@@ -1,4 +1,5 @@
 ﻿using MinecraftServerManager.Communication.Docker;
+using MinecraftServerManager.Minecraft.Users;
 using System.Collections.Concurrent;
 
 namespace MinecraftServerManager.Minecraft

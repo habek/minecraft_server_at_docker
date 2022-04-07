@@ -12,8 +12,8 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
@@ -23,6 +23,9 @@ namespace MinecraftServerManager.Windows
 			this.btnRestart = new System.Windows.Forms.Button();
 			this.btnListUsers = new System.Windows.Forms.Button();
 			this.lvUsers = new System.Windows.Forms.ListView();
+			this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.btnEditPermissions = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
@@ -31,7 +34,7 @@ namespace MinecraftServerManager.Windows
 			this.lvServers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem5});
+            listViewItem1});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
 			this.lvServers.Name = "lvServers";
 			this.lvServers.Size = new System.Drawing.Size(207, 740);
@@ -118,14 +121,38 @@ namespace MinecraftServerManager.Windows
 			// 
 			this.lvUsers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.lvUsers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+			this.lvUsers.FullRowSelect = true;
+			this.lvUsers.GridLines = true;
+			this.lvUsers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem6});
+            listViewItem2});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
+			this.lvUsers.ShowGroups = false;
 			this.lvUsers.Size = new System.Drawing.Size(944, 101);
+			this.lvUsers.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.lvUsers.TabIndex = 8;
 			this.lvUsers.UseCompatibleStateImageBehavior = false;
-			this.lvUsers.View = System.Windows.Forms.View.List;
+			this.lvUsers.View = System.Windows.Forms.View.Details;
+			// 
+			// columnHeader1
+			// 
+			this.columnHeader1.Text = "User";
+			this.columnHeader1.Width = 300;
+			// 
+			// columnHeader2
+			// 
+			this.columnHeader2.Text = "Xuid";
+			this.columnHeader2.Width = 120;
+			// 
+			// columnHeader3
+			// 
+			this.columnHeader3.Text = "Permission";
+			this.columnHeader3.Width = 120;
 			// 
 			// btnEditPermissions
 			// 
@@ -166,5 +193,8 @@ namespace MinecraftServerManager.Windows
 		private Button btnListUsers;
 		private ListView lvUsers;
 		private Button btnEditPermissions;
+		private ColumnHeader columnHeader1;
+		private ColumnHeader columnHeader2;
+		private ColumnHeader columnHeader3;
 	}
 }

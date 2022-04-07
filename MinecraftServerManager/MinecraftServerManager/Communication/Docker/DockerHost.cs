@@ -11,7 +11,7 @@ namespace MinecraftServerManager.Communication.Docker
 {
 	public class DockerHost
 	{
-		DockerClient _client;
+		private DockerClient _client;
 		private IList<ContainerListResponse> _containers = new List<ContainerListResponse>();
 
 		public DockerClient DockerClient => _client;

@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinecraftServerManager.Minecraft
+namespace MinecraftServerManager.Minecraft.Users
 {
 	public class MinecraftUsersManager
 	{
 		private static MinecraftUsersManager? _instance;
-		ConcurrentDictionary<string, XboxUser> _allUsers = new();
+		private ConcurrentDictionary<string, MinecraftUser> _allUsers = new();
 
-		public MinecraftUsersManager(List<XboxUser> knownUsers)
+		public MinecraftUsersManager(List<MinecraftUser> knownUsers)
 		{
 			foreach (var user in knownUsers)
 			{
@@ -32,13 +32,13 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		public XboxUser GetXboxUser(string userName)
+		public MinecraftUser GetXboxUser(string userName)
 		{
-			if (_allUsers.TryGetValue(userName, out XboxUser? user))
+			if (_allUsers.TryGetValue(userName, out MinecraftUser? user))
 			{
 				return user;
 			}
-			user = new XboxUser { UserName = userName };
+			user = new MinecraftUser { UserName = userName };
 			_allUsers.TryAdd(userName, user);
 			return _allUsers[userName];
 		}
@@ -46,7 +46,7 @@ namespace MinecraftServerManager.Minecraft
 		public bool UpdateUser(string userName, string xuid)
 		{
 			var user = GetXboxUser(userName);
-			if(user.Xuid == xuid)
+			if (user.Xuid == xuid)
 			{
 				return false;
 			}
@@ -54,7 +54,7 @@ namespace MinecraftServerManager.Minecraft
 			return true;
 		}
 
-		internal IEnumerable<XboxUser> GetAllUsers()
+		internal IEnumerable<MinecraftUser> GetAllUsers()
 		{
 			return _allUsers.Values;
 		}

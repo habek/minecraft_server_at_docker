@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MinecraftServerManager.Minecraft.MinecraftServer;
+using static System.Windows.Forms.ListViewItem;
 
 namespace MinecraftServerManager.Windows
 {
@@ -80,10 +81,14 @@ namespace MinecraftServerManager.Windows
 			lvUsers.Items.Clear();
 			foreach (var user in minecraftServer.ConnectedUsers)
 			{
-				var item = new ListViewItem(user.ToString())
+				var item = new ListViewItem(user.UserName)
 				{
 					Tag = user
 				};
+				var xuidSubItem = new ListViewSubItem(item, user.Xuid);
+				var permissionSubitem = new ListViewSubItem(item, minecraftServer.GetUserPermission(user)?.PermissionName);
+				item.SubItems.Add(xuidSubItem);
+				item.SubItems.Add(permissionSubitem);
 				lvUsers.Items.Add(item);
 			}
 			lvUsers.EndUpdate();
@@ -128,7 +133,7 @@ namespace MinecraftServerManager.Windows
 			UpdateUserList(minecraftServer);
 		}
 
-		MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
+		private MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
 
 		private void BtnSendCommand_Click(object sender, EventArgs e)
 		{

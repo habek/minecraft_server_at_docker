@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinecraftServerManager.Minecraft
+namespace MinecraftServerManager.Minecraft.Users
 {
-	public class XboxUser
+	public class MinecraftUser
 	{
 		public string UserName { get; set; } = "";
 		public string Xuid { get; set; } = "";

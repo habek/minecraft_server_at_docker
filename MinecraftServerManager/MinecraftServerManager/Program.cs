@@ -1,5 +1,6 @@
 ﻿using MinecraftServerManager;
 using MinecraftServerManager.Minecraft;
+using MinecraftServerManager.Minecraft.Users;
 using MinecraftServerManager.Windows;
 using Newtonsoft.Json;
 using Serilog;
