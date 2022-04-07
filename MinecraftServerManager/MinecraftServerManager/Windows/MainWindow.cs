@@ -32,22 +32,34 @@ namespace MinecraftServerManager.Windows
 				lvServers.Items.Add(new ListViewItem { Text = server.ToString(), Tag = server });
 				server.OnLogAppend = (server, line) =>
 				{
-					if (!IsDisposed) return;
+					if (IsDisposed)
+					{
+						return;
+					};
 					Invoke(OnLogAppend, server, line);
 				};
 				server.OnDataChanged = (server, changedData) =>
 				{
-					if (IsDisposed) return;
+					if (IsDisposed)
+					{
+						return;
+					};
 					Invoke(OnDataChanged, server, changedData);
 				};
 			}
-			if (lvServers.Items.Count > 0)
+			Task.Delay(5000).ContinueWith(t =>
 			{
-				if (lvServers.SelectedItems.Count == 0)
+				Invoke(() =>
 				{
-					lvServers.Items[0].Selected = true;
-				}
-			}
+					if (lvServers.Items.Count > 0)
+					{
+						if (lvServers.SelectedItems.Count == 0)
+						{
+							lvServers.Items[0].Selected = true;
+						}
+					}
+				});
+			});
 		}
 
 		private void OnDataChanged(MinecraftServer minecraftServer, ChangedData changedData)
@@ -87,7 +99,7 @@ namespace MinecraftServerManager.Windows
 			listBox1.TopIndex = listBox1.Items.Count - 1;
 		}
 
-		private void lvServers_SelectedIndexChanged(object sender, EventArgs e)
+		private void LvServers_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (lvServers.SelectedItems.Count == 0)
 			{
@@ -105,7 +117,6 @@ namespace MinecraftServerManager.Windows
 
 			_currentServerId = minecraftServer.Id;
 
-			UpdateUserList(minecraftServer);
 			listBox1.BeginUpdate();
 			listBox1.Items.Clear();
 			foreach (var line in minecraftServer.Logs)
@@ -114,6 +125,7 @@ namespace MinecraftServerManager.Windows
 			}
 			listBox1.TopIndex = listBox1.Items.Count - 1;
 			listBox1.EndUpdate();
+			UpdateUserList(minecraftServer);
 		}
 
 		MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
@@ -123,25 +135,36 @@ namespace MinecraftServerManager.Windows
 			CurrentServer?.SendCommand(cmbCommandToSend.Text + "\n", CancellationToken.None);
 		}
 
+		private void BtnRestart_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.Restart();
+		}
+
+		private void BtnListUsers_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.UpdateUsersList();
+		}
+
 		private void BtnOpenProperties_Click(object sender, EventArgs e)
+		{
+			EditFile(PropertiesPathOnContainer);
+		}
+
+		private void BtnEditPermissions_Click(object sender, EventArgs e)
+		{
+			EditFile(PermissionsPathOnContainer);
+		}
+
+		private void EditFile(string pathInContainer)
 		{
 			var minecraftServer = CurrentServer;
 			if (minecraftServer == null)
 			{
 				return;
 			}
-			var window = new PropertiesFileEditor(minecraftServer);
+			var window = new PropertiesFileEditor(minecraftServer, pathInContainer);
 			window.Show(this);
 		}
 
-		private void BtnRestart_Click(object sender, EventArgs e)
-		{
-			CurrentServer?.Restart();
-		}
-
-		private void btnListUsers_Click(object sender, EventArgs e)
-		{
-			CurrentServer?.UpdateUsersList();
-		}
 	}
 }

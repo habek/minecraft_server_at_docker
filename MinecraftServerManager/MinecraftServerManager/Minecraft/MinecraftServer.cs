@@ -17,11 +17,13 @@ namespace MinecraftServerManager.Minecraft
 {
 	public class MinecraftServer
 	{
-		private const string PropertiesPathOnContainer = "/bedrock/server.properties";
+		public const string PropertiesPathOnContainer = "/bedrock/server.properties";
+		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
 		private readonly List<string> _logs = new List<string>();
 		MemoryStream _logBuffer = new MemoryStream();
 		private readonly DockerClient _dockerClient;
 		private readonly string _containerId;
+
 		private readonly MinecraftUsersManager _minecraftUsersManager;
 
 		public MinecraftServer(MinecraftUsersManager minecraftUsersManager, DockerHost dockerHost, ContainerListResponse container)
@@ -238,15 +240,15 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		internal async Task<string> LoadPropertiesFile()
+		internal async Task<string> LoadTextFile(string pathInContainer)
 		{
-			return Encoding.UTF8.GetString(await GetFile(PropertiesPathOnContainer)).ReplaceLineEndings();
+			return Encoding.UTF8.GetString(await GetFile(pathInContainer)).ReplaceLineEndings();
 		}
 
-		internal async Task SavePropertiesFile(string text)
+		internal async Task SaveTextFile(string pathInContainer, string content)
 		{
-			var content = text.ReplaceLineEndings(LineSeparator);
-			await SaveFile(PropertiesPathOnContainer, Encoding.UTF8.GetBytes(content));
+			content = content.ReplaceLineEndings(LineSeparator);
+			await SaveFile(pathInContainer, Encoding.UTF8.GetBytes(content));
 		}
 
 		private async Task SaveFile(string filePathOnContainer, byte[] content)

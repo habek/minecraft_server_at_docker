@@ -12,8 +12,8 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("itema");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
@@ -23,6 +23,7 @@ namespace MinecraftServerManager.Windows
 			this.btnRestart = new System.Windows.Forms.Button();
 			this.btnListUsers = new System.Windows.Forms.Button();
 			this.lvUsers = new System.Windows.Forms.ListView();
+			this.btnEditPermissions = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -30,14 +31,14 @@ namespace MinecraftServerManager.Windows
 			this.lvServers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem5});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
 			this.lvServers.Name = "lvServers";
 			this.lvServers.Size = new System.Drawing.Size(207, 740);
 			this.lvServers.TabIndex = 0;
 			this.lvServers.UseCompatibleStateImageBehavior = false;
 			this.lvServers.View = System.Windows.Forms.View.List;
-			this.lvServers.SelectedIndexChanged += new System.EventHandler(this.lvServers_SelectedIndexChanged);
+			this.lvServers.SelectedIndexChanged += new System.EventHandler(this.LvServers_SelectedIndexChanged);
 			// 
 			// listBox1
 			// 
@@ -85,9 +86,9 @@ namespace MinecraftServerManager.Windows
 			// 
 			// btnOpenProperties
 			// 
-			this.btnOpenProperties.Location = new System.Drawing.Point(1094, 15);
+			this.btnOpenProperties.Location = new System.Drawing.Point(225, 54);
 			this.btnOpenProperties.Name = "btnOpenProperties";
-			this.btnOpenProperties.Size = new System.Drawing.Size(75, 23);
+			this.btnOpenProperties.Size = new System.Drawing.Size(102, 23);
 			this.btnOpenProperties.TabIndex = 5;
 			this.btnOpenProperties.Text = "Edit properties";
 			this.btnOpenProperties.UseVisualStyleBackColor = true;
@@ -105,20 +106,20 @@ namespace MinecraftServerManager.Windows
 			// 
 			// btnListUsers
 			// 
-			this.btnListUsers.Location = new System.Drawing.Point(674, 44);
+			this.btnListUsers.Location = new System.Drawing.Point(674, 54);
 			this.btnListUsers.Name = "btnListUsers";
 			this.btnListUsers.Size = new System.Drawing.Size(75, 23);
 			this.btnListUsers.TabIndex = 7;
 			this.btnListUsers.Text = "List users";
 			this.btnListUsers.UseVisualStyleBackColor = true;
-			this.btnListUsers.Click += new System.EventHandler(this.btnListUsers_Click);
+			this.btnListUsers.Click += new System.EventHandler(this.BtnListUsers_Click);
 			// 
 			// lvUsers
 			// 
 			this.lvUsers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem2});
+            listViewItem6});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
 			this.lvUsers.Size = new System.Drawing.Size(944, 101);
@@ -126,9 +127,20 @@ namespace MinecraftServerManager.Windows
 			this.lvUsers.UseCompatibleStateImageBehavior = false;
 			this.lvUsers.View = System.Windows.Forms.View.List;
 			// 
+			// btnEditPermissions
+			// 
+			this.btnEditPermissions.Location = new System.Drawing.Point(225, 83);
+			this.btnEditPermissions.Name = "btnEditPermissions";
+			this.btnEditPermissions.Size = new System.Drawing.Size(102, 23);
+			this.btnEditPermissions.TabIndex = 9;
+			this.btnEditPermissions.Text = "Permisions...";
+			this.btnEditPermissions.UseVisualStyleBackColor = true;
+			this.btnEditPermissions.Click += new System.EventHandler(this.BtnEditPermissions_Click);
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnEditPermissions);
 			this.Controls.Add(this.lvUsers);
 			this.Controls.Add(this.btnListUsers);
 			this.Controls.Add(this.btnRestart);
@@ -153,5 +165,6 @@ namespace MinecraftServerManager.Windows
 		private Button btnRestart;
 		private Button btnListUsers;
 		private ListView lvUsers;
+		private Button btnEditPermissions;
 	}
 }

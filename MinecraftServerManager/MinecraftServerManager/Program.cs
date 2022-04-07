@@ -44,7 +44,7 @@ public class Program
 			try
 			{
 				Settings.KnownUsers.Clear();
-				Settings.KnownUsers.AddRange(MinecraftUsersManager.Instance.GetAllUsers());
+				Settings.KnownUsers.AddRange(MinecraftUsersManager.Instance.GetAllUsers().Where(user => user.HasXuid()));
 				File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings, Formatting.Indented));
 			}
 			catch (Exception ex)

@@ -14,5 +14,10 @@ namespace MinecraftServerManager.Minecraft
 		{
 			return $"{UserName}, xuid: {Xuid}";
 		}
+
+		internal bool HasXuid()
+		{
+			return Xuid != null && Xuid.Length > 0;
+		}
 	}
 }
