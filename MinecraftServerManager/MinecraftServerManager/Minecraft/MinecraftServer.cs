@@ -54,7 +54,7 @@ namespace MinecraftServerManager.Minecraft
 		public enum ChangedData { Users }
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
 		public Action<MinecraftServer, string>? OnLogAppend;
-
+		private bool _isRunning;
 		private bool _ttyEnabled;
 		private string? _timestamp;
 
@@ -65,14 +65,20 @@ namespace MinecraftServerManager.Minecraft
 
 		public IReadOnlyList<MinecraftUser> ConnectedUsers => _connectedUsers.Values.ToList();
 
+		public async Task RefreshContainerState(CancellationToken cancellationToken)
+		{
+			var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
+			_isRunning = inspectResponse.State.Running == true;
+			_ttyEnabled = inspectResponse.Config.Tty;
+		}
+
 		public async Task ConnectAsync(CancellationToken cancellationToken)
 		{
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				try
 				{
-					var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
-					_ttyEnabled = inspectResponse.Config.Tty;
+					await RefreshContainerState(cancellationToken);
 					string? since = null;
 					if (_timestamp != null)
 					{
@@ -95,6 +101,11 @@ namespace MinecraftServerManager.Minecraft
 						}
 						if (readResult.EOF)
 						{
+							do
+							{
+								await Task.Delay(1000, cancellationToken);
+								await RefreshContainerState(cancellationToken);
+							} while (!_isRunning);
 							break;
 						}
 					}
@@ -106,6 +117,51 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
+		public async Task Start()
+		{
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			var cancellationToken = cancellationTokenSource.Token;
+			await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters { }, cancellationToken);
+			do
+			{
+				await RefreshContainerState(cancellationToken);
+			} while (!_isRunning);
+		}
+
+		public async Task Stop()
+		{
+			AppendActionLineToLog("Stopping...");
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			cancellationTokenSource.CancelAfter(10000);
+			try
+			{
+				await SendCommand("stop", cancellationTokenSource.Token);
+				do
+				{
+					await Task.Delay(100, cancellationTokenSource.Token);
+					await RefreshContainerState(cancellationTokenSource.Token);
+				} while (_isRunning);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Stop server error");
+			}
+			finally
+			{
+				cancellationTokenSource.Dispose();
+			}
+			cancellationTokenSource = new CancellationTokenSource();
+			int timeout = 20000;
+			cancellationTokenSource.CancelAfter(timeout);
+			await _dockerClient.Containers.StopContainerAsync(_containerId, new ContainerStopParameters { WaitBeforeKillSeconds = (uint)(timeout - 5000) }, cancellationTokenSource.Token);
+			do
+			{
+				await Task.Delay(100, cancellationTokenSource.Token);
+				await RefreshContainerState(cancellationTokenSource.Token);
+			} while (_isRunning);
+			AppendActionLineToLog("Stopped");
+		}
+
 		private async Task UpdateAllData()
 		{
 			await UpdateUsersList();
@@ -114,29 +170,33 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task SendCommand(string command, CancellationToken cancellationToken)
 		{
-			var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationToken).ConfigureAwait(false);
-			try
+			using (var stream = await Attach())
 			{
-				byte[] buffer = new byte[1024];
-				var data = Encoding.UTF8.GetBytes(command);
-				await stream.WriteAsync(data, 0, data.Length, cancellationToken);
-				//while (!cancellationToken.IsCancellationRequested)
-				//{
-				//	var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken);
-				//	if (readResult.Count > 0)
-				//	{
-				//		AppendDataToLog(buffer, readResult);
-				//	}
-				//	else
-				//	{
-				//		await Task.Delay(100, cancellationToken);
-				//	}
-				//}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.Message);
-			}
+				await stream.WriteLine(command);
+			};
+			//var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationToken).ConfigureAwait(false);
+			//try
+			//{
+			//	byte[] buffer = new byte[1024];
+			//	var data = Encoding.UTF8.GetBytes(command);
+			//	await stream.WriteAsync(data, 0, data.Length, cancellationToken);
+			//	//while (!cancellationToken.IsCancellationRequested)
+			//	//{
+			//	//	var readResult = await stream.ReadOutputAsync(buffer, 0, buffer.Length, cancellationToken);
+			//	//	if (readResult.Count > 0)
+			//	//	{
+			//	//		AppendDataToLog(buffer, readResult);
+			//	//	}
+			//	//	else
+			//	//	{
+			//	//		await Task.Delay(100, cancellationToken);
+			//	//	}
+			//	//}
+			//}
+			//catch (Exception ex)
+			//{
+			//	Log.Error(ex.Message);
+			//}
 		}
 
 		internal Permission? GetUserPermission(MinecraftUser user)
@@ -161,6 +221,7 @@ namespace MinecraftServerManager.Minecraft
 						_permissions[permission.Xuid] = permission;
 					}
 				}
+				OnDataChanged?.Invoke(this, ChangedData.Users);
 			}
 			catch (Exception ex)
 			{
@@ -252,15 +313,25 @@ namespace MinecraftServerManager.Minecraft
 
 		private void AppendLineToLog(string line)
 		{
-			if (line.EndsWith("Server started."))
+			//if (line.EndsWith("Server started."))
+			//{
+			//	_ = UpdateAllData();
+			//}
+			//else 
+			if (line.Contains("connected: "))
 			{
-				_ = UpdateAllData();
-			}
-			else if (ConsoleDataParser.IsUserInformation(line, out string? userName, out string? xuid) && !string.IsNullOrEmpty(xuid) && !string.IsNullOrEmpty(userName))
-			{
-				bool userChanged = _minecraftUsersManager.UpdateUser(userName, xuid);
-				if (_connectedUsers.TryAdd(userName, _minecraftUsersManager.GetXboxUser(userName)) || userChanged)
+				if (ConsoleDataParser.IsUserConnectedInformation(line, out string? userName, out string? xuid) && !string.IsNullOrEmpty(xuid) && !string.IsNullOrEmpty(userName))
 				{
+					bool userChanged = _minecraftUsersManager.UpdateUser(userName, xuid);
+					if (_connectedUsers.TryAdd(userName, _minecraftUsersManager.GetXboxUser(userName)) || userChanged)
+					{
+						OnDataChanged?.Invoke(this, ChangedData.Users);
+					}
+				}
+				else if (ConsoleDataParser.IsUserDisconnectedInformation(line, out userName, out xuid) && !string.IsNullOrEmpty(xuid) && !string.IsNullOrEmpty(userName))
+				{
+					_minecraftUsersManager.UpdateUser(userName, xuid);
+					_connectedUsers.TryRemove(userName, out MinecraftUser _);
 					OnDataChanged?.Invoke(this, ChangedData.Users);
 				}
 			}
@@ -311,13 +382,6 @@ namespace MinecraftServerManager.Minecraft
 				}
 			}
 			throw new FileNotFoundException(parameters.Path);
-		}
-
-		public async Task Restart()
-		{
-			AppendActionLineToLog("Restarting...");
-			await _dockerClient.Containers.RestartContainerAsync(_containerId, new ContainerRestartParameters());
-			AppendActionLineToLog("Restarted");
 		}
 	}
 }

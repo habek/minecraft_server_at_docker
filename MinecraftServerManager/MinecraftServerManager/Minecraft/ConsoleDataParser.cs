@@ -23,7 +23,7 @@ namespace MinecraftServerManager.Minecraft
 			return false;
 		}
 
-		public static bool IsUserInformation(string line, out string? userName, out string? xuid)
+		public static bool IsUserConnectedInformation(string line, out string? userName, out string? xuid)
 		{
 			var match = Regex.Match(line, @"Player connected: ([a-zA-Z0-9_]+), xuid: (\d+)");
 			if (match.Success)
@@ -36,6 +36,20 @@ namespace MinecraftServerManager.Minecraft
 			xuid = null;
 			return false;
 		}
+		//[2022-04-10 22:13:56:634 INFO] Player disconnected: HabekTheOne, xuid: 2535405401068560
 
+		public static bool IsUserDisconnectedInformation(string line, out string? userName, out string? xuid)
+		{
+			var match = Regex.Match(line, @"Player disconnected: ([a-zA-Z0-9_]+), xuid: (\d+)");
+			if (match.Success)
+			{
+				userName = match.Groups[1].Value;
+				xuid = match.Groups[2].Value;
+				return true;
+			}
+			userName = null;
+			xuid = null;
+			return false;
+		}
 	}
 }

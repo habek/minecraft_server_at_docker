@@ -12,21 +12,22 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
+			System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.btnSendCommand = new System.Windows.Forms.Button();
 			this.btnOpenProperties = new System.Windows.Forms.Button();
-			this.btnRestart = new System.Windows.Forms.Button();
+			this.btnServerStop = new System.Windows.Forms.Button();
 			this.btnListUsers = new System.Windows.Forms.Button();
 			this.lvUsers = new System.Windows.Forms.ListView();
 			this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.btnEditPermissions = new System.Windows.Forms.Button();
+			this.btnServerStart = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -34,7 +35,7 @@ namespace MinecraftServerManager.Windows
 			this.lvServers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem3});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
 			this.lvServers.Name = "lvServers";
 			this.lvServers.Size = new System.Drawing.Size(207, 740);
@@ -62,7 +63,8 @@ namespace MinecraftServerManager.Windows
 			this.cmbCommandToSend.FormattingEnabled = true;
 			this.cmbCommandToSend.Items.AddRange(new object[] {
             "gamerule",
-            "list"});
+            "list",
+            "stop"});
 			this.cmbCommandToSend.Location = new System.Drawing.Point(416, 12);
 			this.cmbCommandToSend.Name = "cmbCommandToSend";
 			this.cmbCommandToSend.Size = new System.Drawing.Size(240, 23);
@@ -97,15 +99,15 @@ namespace MinecraftServerManager.Windows
 			this.btnOpenProperties.UseVisualStyleBackColor = true;
 			this.btnOpenProperties.Click += new System.EventHandler(this.BtnOpenProperties_Click);
 			// 
-			// btnRestart
+			// btnServerStop
 			// 
-			this.btnRestart.Location = new System.Drawing.Point(1094, 44);
-			this.btnRestart.Name = "btnRestart";
-			this.btnRestart.Size = new System.Drawing.Size(75, 23);
-			this.btnRestart.TabIndex = 6;
-			this.btnRestart.Text = "Restart";
-			this.btnRestart.UseVisualStyleBackColor = true;
-			this.btnRestart.Click += new System.EventHandler(this.BtnRestart_Click);
+			this.btnServerStop.Location = new System.Drawing.Point(1072, 15);
+			this.btnServerStop.Name = "btnServerStop";
+			this.btnServerStop.Size = new System.Drawing.Size(97, 23);
+			this.btnServerStop.TabIndex = 6;
+			this.btnServerStop.Text = "Stop Server";
+			this.btnServerStop.UseVisualStyleBackColor = true;
+			this.btnServerStop.Click += new System.EventHandler(this.BtnRestart_Click);
 			// 
 			// btnListUsers
 			// 
@@ -129,7 +131,7 @@ namespace MinecraftServerManager.Windows
 			this.lvUsers.GridLines = true;
 			this.lvUsers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem2});
+            listViewItem4});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
 			this.lvUsers.ShowGroups = false;
@@ -164,13 +166,24 @@ namespace MinecraftServerManager.Windows
 			this.btnEditPermissions.UseVisualStyleBackColor = true;
 			this.btnEditPermissions.Click += new System.EventHandler(this.BtnEditPermissions_Click);
 			// 
+			// btnServerStart
+			// 
+			this.btnServerStart.Location = new System.Drawing.Point(1072, 44);
+			this.btnServerStart.Name = "btnServerStart";
+			this.btnServerStart.Size = new System.Drawing.Size(97, 23);
+			this.btnServerStart.TabIndex = 10;
+			this.btnServerStart.Text = "Start Server";
+			this.btnServerStart.UseVisualStyleBackColor = true;
+			this.btnServerStart.Click += new System.EventHandler(this.BtnServerStart_Click);
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnServerStart);
 			this.Controls.Add(this.btnEditPermissions);
 			this.Controls.Add(this.lvUsers);
 			this.Controls.Add(this.btnListUsers);
-			this.Controls.Add(this.btnRestart);
+			this.Controls.Add(this.btnServerStop);
 			this.Controls.Add(this.btnOpenProperties);
 			this.Controls.Add(this.btnSendCommand);
 			this.Controls.Add(this.label1);
@@ -189,12 +202,13 @@ namespace MinecraftServerManager.Windows
 		private Label label1;
 		private Button btnSendCommand;
 		private Button btnOpenProperties;
-		private Button btnRestart;
+		private Button btnServerStop;
 		private Button btnListUsers;
 		private ListView lvUsers;
 		private Button btnEditPermissions;
 		private ColumnHeader columnHeader1;
 		private ColumnHeader columnHeader2;
 		private ColumnHeader columnHeader3;
+		private Button btnServerStart;
 	}
 }

@@ -131,18 +131,19 @@ namespace MinecraftServerManager.Windows
 			listBox1.TopIndex = listBox1.Items.Count - 1;
 			listBox1.EndUpdate();
 			UpdateUserList(minecraftServer);
+			CurrentServer?.UpdatePermissions();
 		}
 
 		private MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);
 
 		private void BtnSendCommand_Click(object sender, EventArgs e)
 		{
-			CurrentServer?.SendCommand(cmbCommandToSend.Text + "\n", CancellationToken.None);
+			CurrentServer?.SendCommand(cmbCommandToSend.Text, CancellationToken.None);
 		}
 
 		private void BtnRestart_Click(object sender, EventArgs e)
 		{
-			CurrentServer?.Restart();
+			CurrentServer?.Stop();
 		}
 
 		private void BtnListUsers_Click(object sender, EventArgs e)
@@ -171,5 +172,9 @@ namespace MinecraftServerManager.Windows
 			window.Show(this);
 		}
 
+		private void BtnServerStart_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.Start();
+		}
 	}
 }
