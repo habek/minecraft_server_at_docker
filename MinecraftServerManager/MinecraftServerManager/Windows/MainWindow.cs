@@ -65,6 +65,16 @@ namespace MinecraftServerManager.Windows
 
 		private void OnDataChanged(MinecraftServer minecraftServer, ChangedData changedData)
 		{
+			if (changedData == ChangedData.Users)
+			{
+				foreach (ListViewItem server in lvServers.Items)
+				{
+					if(server.Tag == minecraftServer)
+					{
+						server.Text = minecraftServer.ToString();
+					}
+				}
+			}
 			if (minecraftServer.Id != _currentServerId)
 			{
 				return;

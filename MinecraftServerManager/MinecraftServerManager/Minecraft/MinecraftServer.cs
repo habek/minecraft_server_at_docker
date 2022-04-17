@@ -60,7 +60,12 @@ namespace MinecraftServerManager.Minecraft
 
 		public override string ToString()
 		{
-			return Name;
+			var s = Name.TrimStart('/');
+			if (!_connectedUsers.IsEmpty)
+			{
+				s += $" ({_connectedUsers.Count})";
+			}
+			return s;
 		}
 
 		public IReadOnlyList<MinecraftUser> ConnectedUsers => _connectedUsers.Values.ToList();
