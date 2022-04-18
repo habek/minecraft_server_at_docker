@@ -73,5 +73,15 @@ namespace MinecraftServerManager.Minecraft
 			var line = Encoding.UTF8.GetString(_stdout.GetBuffer().AsSpan().Slice(start, _readPosition - start)).TrimEnd();
 			return line;
 		}
+
+		internal async Task WriteLineWithVerify(string cmd)
+		{
+			await WriteLine(cmd);
+			var confirm = await ReadLine();
+			if(confirm!= cmd)
+			{
+				throw new Exception("Server does not echo command");
+			}
+		}
 	}
 }

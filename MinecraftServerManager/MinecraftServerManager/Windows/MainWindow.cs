@@ -199,5 +199,15 @@ namespace MinecraftServerManager.Windows
 		{
 			CurrentServer?.Start();
 		}
+
+		private void BtnBackup_Click(object sender, EventArgs e)
+		{
+			CurrentServer?.Backup(@"c:\temp\backup.tar.gz");
+		}
+
+		private void BtnRestore_Click(object sender, EventArgs e)
+		{
+
+		}
 	}
 }

@@ -21,6 +21,7 @@ namespace MinecraftServerManager.Minecraft
 	{
 		public const string PropertiesPathOnContainer = "/bedrock/server.properties";
 		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
+		public const string worldFolderOnContainer = "/bedrock/worlds";
 		private readonly List<string> _logs = new List<string>();
 		private readonly MemoryStream _logBuffer = new MemoryStream();
 		private ConcurrentDictionary<string, MinecraftUser> _connectedUsers = new();
@@ -57,6 +58,7 @@ namespace MinecraftServerManager.Minecraft
 			Users = 1,
 			State
 		}
+
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
 		public Action<MinecraftServer, string>? OnLogAppend;
 		private bool _isRunning;
@@ -195,6 +197,69 @@ namespace MinecraftServerManager.Minecraft
 			AppendActionLineToLog("Stopped");
 		}
 
+		public async Task Backup(string destinationPath)
+		{
+			AppendActionLineToLog("Starting backup...");
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			cancellationTokenSource.CancelAfter(10000);
+			var cancellationToken = cancellationTokenSource.Token;
+			try
+			{
+				using (var stream = await Attach())
+				{
+					await stream.WriteLineWithVerify("save hold");
+					try
+					{
+						await stream.ReadLine();//Saving...
+						await stream.WriteLineWithVerify("save query");
+						int maxRetries = 5;
+						int i = 0;
+						while (true)
+						{
+							var line = await stream.ReadLine();
+							if (line.StartsWith("Data saved."))
+							{
+								break;
+							}
+							if (i++ >= maxRetries)
+							{
+								throw new Exception("Wait for saving data failed");
+							}
+						}
+						var filesList = await stream.ReadLine();
+						var filesForBackup = filesList.Split(", ").Select(path => path.Split(":")[0]).ToList();
+						await CreateBackup(filesForBackup, destinationPath);
+						AppendActionLineToLog("Files: " + filesList);
+					}
+					finally
+					{
+						await stream.WriteLineWithVerify("save resume");
+					}
+					AppendActionLineToLog("Backup saved to " + destinationPath);
+				}
+			}
+			catch (Exception ex)
+			{
+				AppendActionLineToLog("Backup error: " + ex.Message);
+				Log.Error(ex, "Backup error");
+			}
+		}
+
+		private async Task CreateBackup(List<string> filesForBackup, string destinationPath)
+		{
+			var tarStream = new MemoryStream();
+			using (var writer = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.GZip))
+			{
+				foreach (var relativePath in filesForBackup)
+				{
+					var fileContent = await GetFile($"{worldFolderOnContainer}/{relativePath}");
+					writer.Write($"worlds/{relativePath}", new MemoryStream(fileContent));
+				}
+			}
+			tarStream.Position = 0;
+			await File.WriteAllBytesAsync(destinationPath, tarStream.ToArray());
+		}
+
 		private async Task UpdateAllData()
 		{
 			await UpdateUsersList();
@@ -277,13 +342,8 @@ namespace MinecraftServerManager.Minecraft
 				var users = new List<MinecraftUser>();
 				using (var stream = await Attach())
 				{
-					await stream.WriteLine("list");
+					await stream.WriteLineWithVerify("list");
 					var line = await stream.ReadLine();
-					if (line != "list")
-					{
-						throw new Exception("List users failure");
-					}
-					line = await stream.ReadLine();
 					if (ConsoleDataParser.IsOnlineInformationDataParsed(line, out int _numberOfPlayers, out int _maxNumberOfPlayers))
 					{
 						for (int i = 0; i < _numberOfPlayers; i++)

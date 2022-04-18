@@ -12,8 +12,8 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
+			System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
@@ -44,7 +44,7 @@ namespace MinecraftServerManager.Windows
 			this.lvServers.FullRowSelect = true;
 			this.lvServers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem5});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
 			this.lvServers.MultiSelect = false;
 			this.lvServers.Name = "lvServers";
@@ -152,7 +152,7 @@ namespace MinecraftServerManager.Windows
 			this.lvUsers.GridLines = true;
 			this.lvUsers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem2});
+            listViewItem6});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
 			this.lvUsers.ShowGroups = false;
@@ -205,6 +205,7 @@ namespace MinecraftServerManager.Windows
 			this.btnBackup.TabIndex = 11;
 			this.btnBackup.Text = "Backup";
 			this.btnBackup.UseVisualStyleBackColor = true;
+			this.btnBackup.Click += new System.EventHandler(this.BtnBackup_Click);
 			// 
 			// btnRestore
 			// 
@@ -214,6 +215,7 @@ namespace MinecraftServerManager.Windows
 			this.btnRestore.TabIndex = 12;
 			this.btnRestore.Text = "Restore";
 			this.btnRestore.UseVisualStyleBackColor = true;
+			this.btnRestore.Click += new System.EventHandler(this.BtnRestore_Click);
 			// 
 			// MainWindow
 			// 
