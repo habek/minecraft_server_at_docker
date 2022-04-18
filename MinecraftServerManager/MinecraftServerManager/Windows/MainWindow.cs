@@ -30,7 +30,12 @@ namespace MinecraftServerManager.Windows
 			lvServers.Items.Clear();
 			foreach (var server in _serversManager.Servers)
 			{
-				lvServers.Items.Add(new ListViewItem { Text = server.ToString(), Tag = server });
+				var stateSubitem = new ListViewSubItem();
+				var serverItem = new ListViewItem { Tag = server };
+				serverItem.SubItems.Add(stateSubitem);
+
+				UpdateServerListViewItem(serverItem);
+				lvServers.Items.Add(serverItem);
 				server.OnLogAppend = (server, line) =>
 				{
 					if (IsDisposed)
@@ -63,15 +68,22 @@ namespace MinecraftServerManager.Windows
 			});
 		}
 
+		private void UpdateServerListViewItem(ListViewItem server)
+		{
+			MinecraftServer minecraftServer = (MinecraftServer)server.Tag;
+			server.Text = minecraftServer.ToString();
+			server.SubItems[1].Text = minecraftServer.State;
+		}
+
 		private void OnDataChanged(MinecraftServer minecraftServer, ChangedData changedData)
 		{
-			if (changedData == ChangedData.Users)
+			if ((changedData & (ChangedData.Users | ChangedData.State))!=0)
 			{
 				foreach (ListViewItem server in lvServers.Items)
 				{
-					if(server.Tag == minecraftServer)
+					if (server.Tag == minecraftServer)
 					{
-						server.Text = minecraftServer.ToString();
+						UpdateServerListViewItem(server);
 					}
 				}
 			}
@@ -84,6 +96,7 @@ namespace MinecraftServerManager.Windows
 				case ChangedData.Users: UpdateUserList(minecraftServer); break;
 			}
 		}
+
 
 		private void UpdateUserList(MinecraftServer minecraftServer)
 		{

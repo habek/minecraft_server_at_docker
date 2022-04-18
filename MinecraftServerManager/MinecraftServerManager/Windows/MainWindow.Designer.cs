@@ -12,9 +12,11 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
+			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
 			this.lvServers = new System.Windows.Forms.ListView();
+			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.cmbCommandToSend = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -28,21 +30,40 @@ namespace MinecraftServerManager.Windows
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.btnEditPermissions = new System.Windows.Forms.Button();
 			this.btnServerStart = new System.Windows.Forms.Button();
+			this.btnBackup = new System.Windows.Forms.Button();
+			this.btnRestore = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
 			// 
 			this.lvServers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.lvServers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader4,
+            this.columnHeader5});
+			this.lvServers.FullRowSelect = true;
+			this.lvServers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
+            listViewItem1});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
+			this.lvServers.MultiSelect = false;
 			this.lvServers.Name = "lvServers";
 			this.lvServers.Size = new System.Drawing.Size(207, 740);
+			this.lvServers.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.lvServers.TabIndex = 0;
 			this.lvServers.UseCompatibleStateImageBehavior = false;
-			this.lvServers.View = System.Windows.Forms.View.List;
+			this.lvServers.View = System.Windows.Forms.View.Details;
 			this.lvServers.SelectedIndexChanged += new System.EventHandler(this.LvServers_SelectedIndexChanged);
+			// 
+			// columnHeader4
+			// 
+			this.columnHeader4.Text = "Name";
+			this.columnHeader4.Width = 120;
+			// 
+			// columnHeader5
+			// 
+			this.columnHeader5.Text = "State";
+			this.columnHeader5.Width = 40;
 			// 
 			// listBox1
 			// 
@@ -131,7 +152,7 @@ namespace MinecraftServerManager.Windows
 			this.lvUsers.GridLines = true;
 			this.lvUsers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem4});
+            listViewItem2});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
 			this.lvUsers.ShowGroups = false;
@@ -176,9 +197,29 @@ namespace MinecraftServerManager.Windows
 			this.btnServerStart.UseVisualStyleBackColor = true;
 			this.btnServerStart.Click += new System.EventHandler(this.BtnServerStart_Click);
 			// 
+			// btnBackup
+			// 
+			this.btnBackup.Location = new System.Drawing.Point(1072, 73);
+			this.btnBackup.Name = "btnBackup";
+			this.btnBackup.Size = new System.Drawing.Size(97, 23);
+			this.btnBackup.TabIndex = 11;
+			this.btnBackup.Text = "Backup";
+			this.btnBackup.UseVisualStyleBackColor = true;
+			// 
+			// btnRestore
+			// 
+			this.btnRestore.Location = new System.Drawing.Point(1072, 102);
+			this.btnRestore.Name = "btnRestore";
+			this.btnRestore.Size = new System.Drawing.Size(97, 23);
+			this.btnRestore.TabIndex = 12;
+			this.btnRestore.Text = "Restore";
+			this.btnRestore.UseVisualStyleBackColor = true;
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnRestore);
+			this.Controls.Add(this.btnBackup);
 			this.Controls.Add(this.btnServerStart);
 			this.Controls.Add(this.btnEditPermissions);
 			this.Controls.Add(this.lvUsers);
@@ -210,5 +251,9 @@ namespace MinecraftServerManager.Windows
 		private ColumnHeader columnHeader2;
 		private ColumnHeader columnHeader3;
 		private Button btnServerStart;
+		private ColumnHeader columnHeader4;
+		private ColumnHeader columnHeader5;
+		private Button btnBackup;
+		private Button btnRestore;
 	}
 }

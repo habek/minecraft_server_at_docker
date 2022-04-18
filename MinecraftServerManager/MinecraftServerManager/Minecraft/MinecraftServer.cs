@@ -51,7 +51,12 @@ namespace MinecraftServerManager.Minecraft
 		public static string LineSeparator { get => "\n"; }
 
 
-		public enum ChangedData { Users }
+		[Flags]
+		public enum ChangedData
+		{
+			Users = 1,
+			State
+		}
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
 		public Action<MinecraftServer, string>? OnLogAppend;
 		private bool _isRunning;
@@ -72,9 +77,21 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task RefreshContainerState(CancellationToken cancellationToken)
 		{
-			var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
-			_isRunning = inspectResponse.State.Running == true;
-			_ttyEnabled = inspectResponse.Config.Tty;
+			try
+			{
+				var inspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId, cancellationToken);
+				_isRunning = inspectResponse.State.Running == true;
+				_ttyEnabled = inspectResponse.Config.Tty;
+				SetState(inspectResponse.State.Status);
+			}
+			catch (Exception ex)
+			{
+				if (ex is DockerContainerNotFoundException containerNotFoundException)
+				{
+					SetState("Not found");
+				}
+				throw;
+			}
 		}
 
 		public async Task ConnectAsync(CancellationToken cancellationToken)
@@ -118,8 +135,19 @@ namespace MinecraftServerManager.Minecraft
 				catch (Exception ex)
 				{
 					Log.Error(ex.Message);
+					await Task.Delay(1000, cancellationToken);
 				}
 			}
+		}
+
+		private void SetState(string newState)
+		{
+			if (newState == State)
+			{
+				return;
+			}
+			State = newState;
+			OnDataChanged?.Invoke(this, ChangedData.State);
 		}
 
 		public async Task Start()
