@@ -1,4 +1,5 @@
 ﻿using MinecraftServerManager.Minecraft.Users;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,17 @@ namespace MinecraftServerManager
 		public string DockerHost { get; set; } = _notSet;
 
 		public List<MinecraftUser> KnownUsers { get; } = new List<MinecraftUser>();
+		public string BackupFolder { get; set; } = "";
+		public string SettingsFilePath { get; set; } = "";
+
+		internal void Save()
+		{
+			File.WriteAllText(SettingsFilePath, JsonConvert.SerializeObject(this, Formatting.Indented));
+		}
+
+		internal string GetBackupFilePath(string name)
+		{
+			return Path.Join(BackupFolder, name, $"backup-{DateTime.Now.ToString("yy-dd-MM-HH-mm-ss")}.tar.gz");
+		}
 	}
 }

@@ -38,19 +38,21 @@
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(12, 12);
+			this.textBox1.Location = new System.Drawing.Point(17, 20);
+			this.textBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.textBox1.Multiline = true;
 			this.textBox1.Name = "textBox1";
 			this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBox1.Size = new System.Drawing.Size(776, 385);
+			this.textBox1.Size = new System.Drawing.Size(1107, 639);
 			this.textBox1.TabIndex = 0;
 			// 
 			// btnSave
 			// 
 			this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSave.Location = new System.Drawing.Point(610, 412);
+			this.btnSave.Location = new System.Drawing.Point(871, 687);
+			this.btnSave.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.btnSave.Name = "btnSave";
-			this.btnSave.Size = new System.Drawing.Size(86, 26);
+			this.btnSave.Size = new System.Drawing.Size(123, 43);
 			this.btnSave.TabIndex = 1;
 			this.btnSave.Text = "Save";
 			this.btnSave.UseVisualStyleBackColor = true;
@@ -59,9 +61,10 @@
 			// btnCancel
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.Location = new System.Drawing.Point(702, 412);
+			this.btnCancel.Location = new System.Drawing.Point(1003, 687);
+			this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.Size = new System.Drawing.Size(86, 26);
+			this.btnCancel.Size = new System.Drawing.Size(123, 43);
 			this.btnCancel.TabIndex = 2;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
@@ -69,12 +72,13 @@
 			// 
 			// PropertiesFileEditor
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(800, 450);
+			this.ClientSize = new System.Drawing.Size(1143, 750);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnSave);
 			this.Controls.Add(this.textBox1);
+			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "PropertiesFileEditor";
 			this.Text = "PropertiesFileEditor";
 			this.ResumeLayout(false);

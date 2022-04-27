@@ -13,6 +13,7 @@ namespace MinecraftServerManager.Windows
 	{
 		private readonly ServersManager _serversManager;
 		private string? _currentServerId;
+		private ConfigurationWindow _configurationWindow;
 
 		public MainWindow(ServersManager serversManager)
 		{
@@ -77,7 +78,7 @@ namespace MinecraftServerManager.Windows
 
 		private void OnDataChanged(MinecraftServer minecraftServer, ChangedData changedData)
 		{
-			if ((changedData & (ChangedData.Users | ChangedData.State))!=0)
+			if ((changedData & (ChangedData.Users | ChangedData.State)) != 0)
 			{
 				foreach (ListViewItem server in lvServers.Items)
 				{
@@ -202,12 +203,25 @@ namespace MinecraftServerManager.Windows
 
 		private void BtnBackup_Click(object sender, EventArgs e)
 		{
-			CurrentServer?.Backup(@"c:\temp\backup.tar.gz");
+			CurrentServer?.Backup(Program.Settings.GetBackupFilePath(CurrentServer.Name));
 		}
+
+		OpenFileDialog? openFileDialog;
 
 		private void BtnRestore_Click(object sender, EventArgs e)
 		{
+			openFileDialog ??= new OpenFileDialog();
+			if (openFileDialog.ShowDialog(this) != DialogResult.OK)
+			{
+				return;
+			}
+			CurrentServer?.Restore(openFileDialog.FileName);
+		}
 
+		private void BtnSettings_Click(object sender, EventArgs e)
+		{
+			_configurationWindow ??= new ConfigurationWindow();
+			_configurationWindow.ShowDialog();
 		}
 	}
 }

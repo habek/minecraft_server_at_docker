@@ -91,6 +91,7 @@ namespace MinecraftServerManager.Minecraft
 				if (ex is DockerContainerNotFoundException containerNotFoundException)
 				{
 					SetState("Not found");
+					_isRunning = false;
 				}
 				throw;
 			}
@@ -176,25 +177,98 @@ namespace MinecraftServerManager.Minecraft
 					await Task.Delay(100, cancellationTokenSource.Token);
 					await RefreshContainerState(cancellationTokenSource.Token);
 				} while (_isRunning);
+				AppendActionLineToLog("Stopped gracefully");
+				return;
 			}
 			catch (Exception ex)
 			{
+				AppendActionLineToLog("Stop server error: " + ex.Message);
 				Log.Error(ex, "Stop server error");
 			}
 			finally
 			{
 				cancellationTokenSource.Dispose();
 			}
-			cancellationTokenSource = new CancellationTokenSource();
-			int timeout = 20000;
-			cancellationTokenSource.CancelAfter(timeout);
-			await _dockerClient.Containers.StopContainerAsync(_containerId, new ContainerStopParameters { WaitBeforeKillSeconds = (uint)(timeout - 5000) }, cancellationTokenSource.Token);
-			do
+			using var cancellationTokenSource2 = new CancellationTokenSource();
 			{
-				await Task.Delay(100, cancellationTokenSource.Token);
-				await RefreshContainerState(cancellationTokenSource.Token);
-			} while (_isRunning);
-			AppendActionLineToLog("Stopped");
+				AppendActionLineToLog("Stopping container");
+				int timeout = 10000;
+				cancellationTokenSource2.CancelAfter(timeout);
+				try
+				{
+					await _dockerClient.Containers.StopContainerAsync(_containerId, new ContainerStopParameters { WaitBeforeKillSeconds = (uint)(timeout - 5000) }, cancellationTokenSource2.Token);
+					do
+					{
+						await Task.Delay(100, cancellationTokenSource2.Token);
+						await RefreshContainerState(cancellationTokenSource2.Token);
+					} while (_isRunning);
+					AppendActionLineToLog("Stopped (forced)");
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex, "Stop container error");
+					AppendActionLineToLog("Stop container error: " + ex.Message);
+				}
+			}
+		}
+
+		internal async void Restore(string fileName)
+		{
+			AppendActionLineToLog("Starting restore...");
+			try
+			{
+
+				var newArchive = new MemoryStream();
+				using (var writer = WriterFactory.Open(newArchive, ArchiveType.Tar, CompressionType.GZip))
+				{
+					using (var reader = ReaderFactory.Open(File.OpenRead(fileName)))
+					{
+						while (reader.MoveToNextEntry())
+						{
+							if (!reader.Entry.IsDirectory)
+							{
+								var memoryStream = new MemoryStream();
+								reader.WriteEntryTo(memoryStream);
+								var destPath = reader.Entry.Key;
+								const string worlds = "worlds/";
+								if (destPath.StartsWith(worlds))
+								{
+									destPath = destPath[worlds.Length..];
+								}
+								memoryStream.Position = 0;
+								writer.Write(destPath, memoryStream, reader.Entry.LastModifiedTime);
+							}
+						}
+					}
+				}
+				await Stop();
+				try
+				{
+
+
+					using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+					cancellationTokenSource.CancelAfter(60000);
+					var cancellationToken = cancellationTokenSource.Token;
+					newArchive.Position = 0;
+					await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = worldFolderOnContainer }, newArchive);
+				}
+				finally
+				{
+					try
+					{
+						await Start();
+					}
+					catch (Exception)
+					{
+
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Restore backup failed");
+				AppendActionLineToLog("Restore backup failed: " + ex.Message);
+			}
 		}
 
 		public async Task Backup(string destinationPath)
@@ -233,7 +307,7 @@ namespace MinecraftServerManager.Minecraft
 					}
 					finally
 					{
-						await stream.WriteLineWithVerify("save resume");
+						await stream.WriteLine("save resume");
 					}
 					AppendActionLineToLog("Backup saved to " + destinationPath);
 				}
@@ -247,16 +321,20 @@ namespace MinecraftServerManager.Minecraft
 
 		private async Task CreateBackup(List<string> filesForBackup, string destinationPath)
 		{
+			string? destDir = Path.GetDirectoryName(destinationPath);
+			if (destDir != null)
+			{
+				Directory.CreateDirectory(destDir);
+			}
 			var tarStream = new MemoryStream();
 			using (var writer = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.GZip))
 			{
 				foreach (var relativePath in filesForBackup)
 				{
-					var fileContent = await GetFile($"{worldFolderOnContainer}/{relativePath}");
-					writer.Write($"worlds/{relativePath}", new MemoryStream(fileContent));
+					var fileData = await GetFile($"{worldFolderOnContainer}/{relativePath}");
+					writer.Write($"worlds/{relativePath}", new MemoryStream(fileData.Content), fileData.ModificationTime);
 				}
 			}
-			tarStream.Position = 0;
 			await File.WriteAllBytesAsync(destinationPath, tarStream.ToArray());
 		}
 
@@ -440,7 +518,7 @@ namespace MinecraftServerManager.Minecraft
 
 		internal async Task<string> LoadTextFile(string pathInContainer)
 		{
-			return Encoding.UTF8.GetString(await GetFile(pathInContainer)).ReplaceLineEndings();
+			return Encoding.UTF8.GetString((await GetFile(pathInContainer)).Content).ReplaceLineEndings();
 		}
 
 		internal async Task SaveTextFile(string pathInContainer, string content)
@@ -460,7 +538,13 @@ namespace MinecraftServerManager.Minecraft
 			await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = Path.GetDirectoryName(filePathOnContainer)?.Replace(Path.DirectorySeparatorChar, '/') }, tarStream);
 		}
 
-		internal async Task<byte[]> GetFile(string filePathOnContainer)
+		public class FileData
+		{
+			public byte[] Content { get; set; } = Array.Empty<byte>();
+			public DateTime? ModificationTime { get; set; }
+		}
+
+		internal async Task<FileData> GetFile(string filePathOnContainer)
 		{
 			GetArchiveFromContainerParameters parameters = new GetArchiveFromContainerParameters { Path = filePathOnContainer };
 			var response = await _dockerClient.Containers.GetArchiveFromContainerAsync(_containerId, parameters, false);
@@ -471,7 +555,7 @@ namespace MinecraftServerManager.Minecraft
 				{
 					var memoryStream = new MemoryStream();
 					reader.WriteEntryTo(memoryStream);
-					return memoryStream.ToArray();
+					return new FileData { Content = memoryStream.ToArray(), ModificationTime = reader.Entry.LastModifiedTime };
 				}
 			}
 			throw new FileNotFoundException(parameters.Path);

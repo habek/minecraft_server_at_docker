@@ -32,6 +32,7 @@ namespace MinecraftServerManager.Windows
 			this.btnServerStart = new System.Windows.Forms.Button();
 			this.btnBackup = new System.Windows.Forms.Button();
 			this.btnRestore = new System.Windows.Forms.Button();
+			this.btnSettings = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -72,11 +73,11 @@ namespace MinecraftServerManager.Windows
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.listBox1.FormattingEnabled = true;
 			this.listBox1.HorizontalScrollbar = true;
-			this.listBox1.ItemHeight = 15;
+			this.listBox1.ItemHeight = 25;
 			this.listBox1.Location = new System.Drawing.Point(225, 238);
 			this.listBox1.Name = "listBox1";
 			this.listBox1.ScrollAlwaysVisible = true;
-			this.listBox1.Size = new System.Drawing.Size(944, 514);
+			this.listBox1.Size = new System.Drawing.Size(944, 504);
 			this.listBox1.TabIndex = 1;
 			// 
 			// cmbCommandToSend
@@ -88,7 +89,7 @@ namespace MinecraftServerManager.Windows
             "stop"});
 			this.cmbCommandToSend.Location = new System.Drawing.Point(416, 12);
 			this.cmbCommandToSend.Name = "cmbCommandToSend";
-			this.cmbCommandToSend.Size = new System.Drawing.Size(240, 23);
+			this.cmbCommandToSend.Size = new System.Drawing.Size(240, 33);
 			this.cmbCommandToSend.TabIndex = 2;
 			// 
 			// label1
@@ -96,7 +97,7 @@ namespace MinecraftServerManager.Windows
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(290, 15);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(94, 15);
+			this.label1.Size = new System.Drawing.Size(142, 25);
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Send command:";
 			// 
@@ -217,9 +218,20 @@ namespace MinecraftServerManager.Windows
 			this.btnRestore.UseVisualStyleBackColor = true;
 			this.btnRestore.Click += new System.EventHandler(this.BtnRestore_Click);
 			// 
+			// btnSettings
+			// 
+			this.btnSettings.Location = new System.Drawing.Point(969, 15);
+			this.btnSettings.Name = "btnSettings";
+			this.btnSettings.Size = new System.Drawing.Size(97, 23);
+			this.btnSettings.TabIndex = 13;
+			this.btnSettings.Text = "Settings";
+			this.btnSettings.UseVisualStyleBackColor = true;
+			this.btnSettings.Click += new System.EventHandler(this.BtnSettings_Click);
+			// 
 			// MainWindow
 			// 
 			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.Controls.Add(this.btnSettings);
 			this.Controls.Add(this.btnRestore);
 			this.Controls.Add(this.btnBackup);
 			this.Controls.Add(this.btnServerStart);
@@ -257,5 +269,6 @@ namespace MinecraftServerManager.Windows
 		private ColumnHeader columnHeader5;
 		private Button btnBackup;
 		private Button btnRestore;
+		private Button btnSettings;
 	}
 }

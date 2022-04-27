@@ -33,6 +33,7 @@ public class Program
 			{
 				Log.Warning(ex, "Settings load error");
 			}
+			Settings.SettingsFilePath = settingsPath;
 			var mainWindow = new MainWindow(new ServersManager(CancellationToken.None));
 			Application.Run(mainWindow);
 		}
@@ -46,7 +47,7 @@ public class Program
 			{
 				Settings.KnownUsers.Clear();
 				Settings.KnownUsers.AddRange(MinecraftUsersManager.Instance.GetAllUsers().Where(user => user.HasXuid()));
-				File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Settings, Formatting.Indented));
+				Settings.Save();
 			}
 			catch (Exception ex)
 			{
