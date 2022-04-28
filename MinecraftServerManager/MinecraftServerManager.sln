@@ -5,7 +5,11 @@ VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinecraftServerManager", "MinecraftServerManager\MinecraftServerManager.csproj", "{48DBBFE1-6CAA-429E-B807-3D7A75EB893E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinecraftServerManagerTests", "MinecraftServerManagerTests\MinecraftServerManagerTests.csproj", "{959F4251-D881-480C-8A40-D7A52BE74E01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinecraftServerManagerTests", "MinecraftServerManagerTests\MinecraftServerManagerTests.csproj", "{959F4251-D881-480C-8A40-D7A52BE74E01}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "web-ui", "web-ui\web-ui.esproj", "{88E02C00-1631-40F7-AF8E-8C480D5893D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "web-api", "web-api\web-api.csproj", "{114A5343-DDEB-4F87-BB59-1D416068D414}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,16 @@ Global
 		{959F4251-D881-480C-8A40-D7A52BE74E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{959F4251-D881-480C-8A40-D7A52BE74E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{959F4251-D881-480C-8A40-D7A52BE74E01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88E02C00-1631-40F7-AF8E-8C480D5893D1}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{114A5343-DDEB-4F87-BB59-1D416068D414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{114A5343-DDEB-4F87-BB59-1D416068D414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{114A5343-DDEB-4F87-BB59-1D416068D414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{114A5343-DDEB-4F87-BB59-1D416068D414}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
