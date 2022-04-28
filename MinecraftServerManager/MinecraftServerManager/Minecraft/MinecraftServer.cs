@@ -56,7 +56,8 @@ namespace MinecraftServerManager.Minecraft
 		public enum ChangedData
 		{
 			Users = 1,
-			State
+			State,
+			Configuration
 		}
 
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
@@ -64,6 +65,7 @@ namespace MinecraftServerManager.Minecraft
 		private bool _isRunning;
 		private bool _ttyEnabled;
 		private string? _timestamp;
+		private string? _minecraftVersion;
 
 		public override string ToString()
 		{
@@ -76,6 +78,8 @@ namespace MinecraftServerManager.Minecraft
 		}
 
 		public IReadOnlyList<MinecraftUser> ConnectedUsers => _connectedUsers.Values.ToList();
+
+		public string? MinecraftVersion { get => _minecraftVersion; }
 
 		public async Task RefreshContainerState(CancellationToken cancellationToken)
 		{
@@ -489,7 +493,15 @@ namespace MinecraftServerManager.Minecraft
 			//	_ = UpdateAllData();
 			//}
 			//else 
-			if (line.Contains("connected: "))
+			if (line.Contains("Version"))
+			{
+				if(ConsoleDataParser.IsVersionInformation(line, out string? version))
+				{
+					_minecraftVersion = version;
+					OnDataChanged?.Invoke(this, ChangedData.Configuration);
+				}
+			}
+			else if (line.Contains("connected: "))
 			{
 				if (ConsoleDataParser.IsUserConnectedInformation(line, out string? userName, out string? xuid) && !string.IsNullOrEmpty(xuid) && !string.IsNullOrEmpty(userName))
 				{

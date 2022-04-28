@@ -51,5 +51,17 @@ namespace MinecraftServerManager.Minecraft
 			xuid = null;
 			return false;
 		}
+
+		internal static bool IsVersionInformation(string line, out string? version)
+		{
+			var match = Regex.Match(line, @"Version (\d+\.\d+\.\d+\.\d+)");
+			if (match.Success)
+			{
+				version = match.Groups[1].Value;
+				return true;
+			}
+			version = null;
+			return false;
+		}
 	}
 }

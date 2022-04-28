@@ -95,9 +95,14 @@ namespace MinecraftServerManager.Windows
 			switch (changedData)
 			{
 				case ChangedData.Users: UpdateUserList(minecraftServer); break;
+				case ChangedData.Configuration: UpdateConfiguration(minecraftServer); break;
 			}
 		}
 
+		private void UpdateConfiguration(MinecraftServer minecraftServer)
+		{
+			tbVersion.Text = minecraftServer.MinecraftVersion;
+		}
 
 		private void UpdateUserList(MinecraftServer minecraftServer)
 		{
@@ -156,6 +161,7 @@ namespace MinecraftServerManager.Windows
 			listBox1.EndUpdate();
 			UpdateUserList(minecraftServer);
 			CurrentServer?.UpdatePermissions();
+			UpdateConfiguration(minecraftServer);
 		}
 
 		private MinecraftServer? CurrentServer => _serversManager.Servers.FirstOrDefault(s => s.Id == _currentServerId);

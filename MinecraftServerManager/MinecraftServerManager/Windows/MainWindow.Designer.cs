@@ -12,8 +12,8 @@ namespace MinecraftServerManager.Windows
 
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("itema");
-			System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("");
+			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("itema");
+			System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
 			this.lvServers = new System.Windows.Forms.ListView();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
@@ -33,6 +33,8 @@ namespace MinecraftServerManager.Windows
 			this.btnBackup = new System.Windows.Forms.Button();
 			this.btnRestore = new System.Windows.Forms.Button();
 			this.btnSettings = new System.Windows.Forms.Button();
+			this.label2 = new System.Windows.Forms.Label();
+			this.tbVersion = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// lvServers
@@ -45,11 +47,11 @@ namespace MinecraftServerManager.Windows
 			this.lvServers.FullRowSelect = true;
 			this.lvServers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvServers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem5});
+            listViewItem1});
 			this.lvServers.Location = new System.Drawing.Point(12, 12);
 			this.lvServers.MultiSelect = false;
 			this.lvServers.Name = "lvServers";
-			this.lvServers.Size = new System.Drawing.Size(207, 740);
+			this.lvServers.Size = new System.Drawing.Size(207, 888);
 			this.lvServers.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.lvServers.TabIndex = 0;
 			this.lvServers.UseCompatibleStateImageBehavior = false;
@@ -77,7 +79,7 @@ namespace MinecraftServerManager.Windows
 			this.listBox1.Location = new System.Drawing.Point(225, 238);
 			this.listBox1.Name = "listBox1";
 			this.listBox1.ScrollAlwaysVisible = true;
-			this.listBox1.Size = new System.Drawing.Size(944, 504);
+			this.listBox1.Size = new System.Drawing.Size(1172, 629);
 			this.listBox1.TabIndex = 1;
 			// 
 			// cmbCommandToSend
@@ -153,11 +155,11 @@ namespace MinecraftServerManager.Windows
 			this.lvUsers.GridLines = true;
 			this.lvUsers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.lvUsers.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem6});
+            listViewItem2});
 			this.lvUsers.Location = new System.Drawing.Point(225, 131);
 			this.lvUsers.Name = "lvUsers";
 			this.lvUsers.ShowGroups = false;
-			this.lvUsers.Size = new System.Drawing.Size(944, 101);
+			this.lvUsers.Size = new System.Drawing.Size(547, 101);
 			this.lvUsers.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.lvUsers.TabIndex = 8;
 			this.lvUsers.UseCompatibleStateImageBehavior = false;
@@ -228,9 +230,28 @@ namespace MinecraftServerManager.Windows
 			this.btnSettings.UseVisualStyleBackColor = true;
 			this.btnSettings.Click += new System.EventHandler(this.BtnSettings_Click);
 			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(785, 131);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(121, 31);
+			this.label2.TabIndex = 15;
+			this.label2.Text = "Version";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// tbVersion
+			// 
+			this.tbVersion.Location = new System.Drawing.Point(912, 131);
+			this.tbVersion.Name = "tbVersion";
+			this.tbVersion.ReadOnly = true;
+			this.tbVersion.Size = new System.Drawing.Size(164, 31);
+			this.tbVersion.TabIndex = 14;
+			// 
 			// MainWindow
 			// 
-			this.ClientSize = new System.Drawing.Size(1181, 764);
+			this.ClientSize = new System.Drawing.Size(1409, 912);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.tbVersion);
 			this.Controls.Add(this.btnSettings);
 			this.Controls.Add(this.btnRestore);
 			this.Controls.Add(this.btnBackup);
@@ -270,5 +291,7 @@ namespace MinecraftServerManager.Windows
 		private Button btnBackup;
 		private Button btnRestore;
 		private Button btnSettings;
+		private Label label2;
+		private TextBox tbVersion;
 	}
 }
