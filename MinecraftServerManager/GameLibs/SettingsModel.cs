@@ -18,12 +18,12 @@ namespace MinecraftServerManager
 		public string BackupFolder { get; set; } = "";
 		public string SettingsFilePath { get; set; } = "";
 
-		internal void Save()
+		public void Save()
 		{
 			File.WriteAllText(SettingsFilePath, JsonConvert.SerializeObject(this, Formatting.Indented));
 		}
 
-		internal string GetBackupFilePath(string name)
+		public string GetBackupFilePath(string name)
 		{
 			return Path.Join(BackupFolder, name, $"backup-{DateTime.Now.ToString("yy-dd-MM-HH-mm-ss")}.tar.gz");
 		}

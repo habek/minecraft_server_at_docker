@@ -15,7 +15,7 @@ namespace MinecraftServerManager.Minecraft.Users
 			return $"{UserName}, xuid: {Xuid}";
 		}
 
-		internal bool HasXuid()
+		public bool HasXuid()
 		{
 			return Xuid != null && Xuid.Length > 0;
 		}

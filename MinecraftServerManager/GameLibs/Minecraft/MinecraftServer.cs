@@ -216,7 +216,7 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		internal async void Restore(string fileName)
+		public async void Restore(string fileName)
 		{
 			AppendActionLineToLog("Starting restore...");
 			try
@@ -379,7 +379,7 @@ namespace MinecraftServerManager.Minecraft
 			//}
 		}
 
-		internal Permission? GetUserPermission(MinecraftUser user)
+		public Permission? GetUserPermission(MinecraftUser user)
 		{
 			if (_permissions.TryGetValue(user.Xuid, out Permission? permission))
 			{
@@ -528,12 +528,12 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		internal async Task<string> LoadTextFile(string pathInContainer)
+		public async Task<string> LoadTextFile(string pathInContainer)
 		{
 			return Encoding.UTF8.GetString((await GetFile(pathInContainer)).Content).ReplaceLineEndings();
 		}
 
-		internal async Task SaveTextFile(string pathInContainer, string content)
+		public async Task SaveTextFile(string pathInContainer, string content)
 		{
 			content = content.ReplaceLineEndings(LineSeparator);
 			await SaveFile(pathInContainer, Encoding.UTF8.GetBytes(content));

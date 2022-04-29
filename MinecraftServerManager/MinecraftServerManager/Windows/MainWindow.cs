@@ -13,7 +13,7 @@ namespace MinecraftServerManager.Windows
 	{
 		private readonly ServersManager _serversManager;
 		private string? _currentServerId;
-		private ConfigurationWindow _configurationWindow;
+		private ConfigurationWindow? _configurationWindow;
 
 		public MainWindow(ServersManager serversManager)
 		{

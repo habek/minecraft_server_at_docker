@@ -13,6 +13,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 
-app.use('/api', createProxyMiddleware({ target: 'http://localhost:5054/', changeOrigin: false }));
+app.use('/api', createProxyMiddleware({ target: 'http://localhost:5054/', changeOrigin: false, ws: true }));
 app.use('/', createProxyMiddleware({ target: 'http://localhost:3000/', changeOrigin: false }));
+console.info("Starting server at " + port);
 app.listen(port);

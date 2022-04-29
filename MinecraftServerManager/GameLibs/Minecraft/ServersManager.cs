@@ -8,11 +8,13 @@ namespace MinecraftServerManager.Minecraft
 	{
 		private DockerHost _dockerHost;
 		private ConcurrentDictionary<string, MinecraftServer> _minecraftServers = new ConcurrentDictionary<string, MinecraftServer>();
+		private readonly MinecraftUsersManager _minecraftUsersManager;
 		private readonly CancellationToken _cancellationToken;
 
-		public ServersManager(CancellationToken cancellationToken)
+		public ServersManager(MinecraftUsersManager minecraftUsersManager, SettingsModel settings, CancellationToken cancellationToken)
 		{
-			_dockerHost = new DockerHost($"tcp://{Program.Settings.DockerHost}:2375");
+			_dockerHost = new DockerHost($"tcp://{settings.DockerHost}:2375");
+			_minecraftUsersManager = minecraftUsersManager;
 			_cancellationToken = cancellationToken;
 		}
 
@@ -27,7 +29,7 @@ namespace MinecraftServerManager.Minecraft
 					{
 						//continue;
 					}
-					server = new MinecraftServer(MinecraftUsersManager.Instance, _dockerHost, container);
+					server = new MinecraftServer(_minecraftUsersManager, _dockerHost, container);
 					_minecraftServers[container.ID] = server;
 				}
 			}

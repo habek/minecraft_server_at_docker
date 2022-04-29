@@ -34,25 +34,29 @@ public class Program
 				Log.Warning(ex, "Settings load error");
 			}
 			Settings.SettingsFilePath = settingsPath;
-			var mainWindow = new MainWindow(new ServersManager(CancellationToken.None));
-			Application.Run(mainWindow);
+			MinecraftUsersManager minecraftUsersManager = new MinecraftUsersManager(Settings);
+			var mainWindow = new MainWindow(new ServersManager(minecraftUsersManager, Settings, CancellationToken.None));
+			try
+			{
+				Application.Run(mainWindow);
+			}
+			finally
+			{
+				try
+				{
+					Settings.KnownUsers.Clear();
+					Settings.KnownUsers.AddRange(minecraftUsersManager.GetAllUsers().Where(user => user.HasXuid()));
+					Settings.Save();
+				}
+				catch (Exception ex)
+				{
+					Log.Warning(ex, "Settings save error");
+				}
+			}
 		}
 		catch (Exception ex)
 		{
 			Log.Error(ex, ex.Message);
-		}
-		finally
-		{
-			try
-			{
-				Settings.KnownUsers.Clear();
-				Settings.KnownUsers.AddRange(MinecraftUsersManager.Instance.GetAllUsers().Where(user => user.HasXuid()));
-				Settings.Save();
-			}
-			catch (Exception ex)
-			{
-				Log.Warning(ex, "Settings save error");
-			}
 		}
 		Log.CloseAndFlush();
 	}

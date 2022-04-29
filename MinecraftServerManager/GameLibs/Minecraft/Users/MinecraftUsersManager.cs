@@ -10,27 +10,29 @@ namespace MinecraftServerManager.Minecraft.Users
 	public class MinecraftUsersManager
 	{
 		private static MinecraftUsersManager? _instance;
+		private readonly SettingsModel _settings;
 		private ConcurrentDictionary<string, MinecraftUser> _allUsers = new();
 
-		public MinecraftUsersManager(List<MinecraftUser> knownUsers)
+		public MinecraftUsersManager(SettingsModel settings)
 		{
-			foreach (var user in knownUsers)
+			foreach (var user in settings.KnownUsers)
 			{
 				_allUsers.TryAdd(user.UserName, user);
 			}
+			_settings = settings;
 		}
 
-		public static MinecraftUsersManager Instance
-		{
-			get
-			{
-				if (_instance == null)
-				{
-					_instance = new MinecraftUsersManager(Program.Settings.KnownUsers);
-				}
-				return _instance;
-			}
-		}
+		//public static MinecraftUsersManager Instance
+		//{
+		//	get
+		//	{
+		//		if (_instance == null)
+		//		{
+		//			_instance = new MinecraftUsersManager(_settings.KnownUsers);
+		//		}
+		//		return _instance;
+		//	}
+		//}
 
 		public MinecraftUser GetXboxUser(string userName)
 		{
@@ -54,7 +56,7 @@ namespace MinecraftServerManager.Minecraft.Users
 			return true;
 		}
 
-		internal IEnumerable<MinecraftUser> GetAllUsers()
+		public IEnumerable<MinecraftUser> GetAllUsers()
 		{
 			return _allUsers.Values;
 		}

@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "web-api", "web-api\web-api.
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "web-proxy", "web-proxy\web-proxy.njsproj", "{CF8409B3-B3F1-44EA-AA45-D964B60960CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLibs", "GameLibs\GameLibs.csproj", "{7EC0B7E0-E142-4D00-9120-1C18FF5D77CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{CF8409B3-B3F1-44EA-AA45-D964B60960CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF8409B3-B3F1-44EA-AA45-D964B60960CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF8409B3-B3F1-44EA-AA45-D964B60960CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC0B7E0-E142-4D00-9120-1C18FF5D77CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC0B7E0-E142-4D00-9120-1C18FF5D77CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC0B7E0-E142-4D00-9120-1C18FF5D77CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC0B7E0-E142-4D00-9120-1C18FF5D77CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
