@@ -9,8 +9,6 @@ namespace MinecraftServerManager.Minecraft.Users
 {
 	public class MinecraftUsersManager
 	{
-		private static MinecraftUsersManager? _instance;
-		private readonly SettingsModel _settings;
 		private ConcurrentDictionary<string, MinecraftUser> _allUsers = new();
 
 		public MinecraftUsersManager(SettingsModel settings)
@@ -19,20 +17,7 @@ namespace MinecraftServerManager.Minecraft.Users
 			{
 				_allUsers.TryAdd(user.UserName, user);
 			}
-			_settings = settings;
 		}
-
-		//public static MinecraftUsersManager Instance
-		//{
-		//	get
-		//	{
-		//		if (_instance == null)
-		//		{
-		//			_instance = new MinecraftUsersManager(_settings.KnownUsers);
-		//		}
-		//		return _instance;
-		//	}
-		//}
 
 		public MinecraftUser GetXboxUser(string userName)
 		{
