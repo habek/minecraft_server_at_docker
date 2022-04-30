@@ -35,7 +35,7 @@ public class Program
 			}
 			Settings.SettingsFilePath = settingsPath;
 			MinecraftUsersManager minecraftUsersManager = new MinecraftUsersManager(Settings);
-			var mainWindow = new MainWindow(new ServersManager(minecraftUsersManager, Settings, CancellationToken.None));
+			var mainWindow = new MainWindow(new ServersManager(minecraftUsersManager, Settings));
 			try
 			{
 				Application.Run(mainWindow);
