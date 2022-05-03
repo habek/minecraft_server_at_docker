@@ -28,12 +28,18 @@ namespace MinecraftServerManager.Minecraft
 						//continue;
 					}
 					server = new MinecraftServer(_minecraftUsersManager, _dockerHost, container);
-					_minecraftServers[container.ID] = server;
+					_minecraftServers[server.Name] = server;
 				}
 			}
 			OnServerListChanged?.Invoke();
 		}
 		public IList<MinecraftServer> Servers => _minecraftServers.Values.ToList();
+
+		public MinecraftServer? GetMinecraftServer(string serverName)
+		{
+			_minecraftServers.TryGetValue(serverName, out MinecraftServer? server);
+			return server;
+		}
 
 		public Action? OnServerListChanged { get; set; }
 	}

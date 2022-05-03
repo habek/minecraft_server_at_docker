@@ -60,8 +60,20 @@ namespace MinecraftServerManager.Minecraft
 			Configuration
 		}
 
+		public class LogAppendEventArgs
+		{
+			public MinecraftServer MinecraftServer { get; set; }
+			public string Line { get; set; }
+
+			public LogAppendEventArgs(MinecraftServer minecraftServer, string line)
+			{
+				MinecraftServer = minecraftServer;
+				Line = line;
+			}
+		}
+
 		public Action<MinecraftServer, ChangedData>? OnDataChanged;
-		public Action<MinecraftServer, string>? OnLogAppend;
+		public EventHandler<LogAppendEventArgs>? OnLogAppend;
 		private bool _isRunning;
 		private bool _ttyEnabled;
 		private string? _timestamp;
@@ -518,10 +530,8 @@ namespace MinecraftServerManager.Minecraft
 					OnDataChanged?.Invoke(this, ChangedData.Users);
 				}
 			}
-			if (OnLogAppend != null)
-			{
-				OnLogAppend(this, line);
-			}
+			OnLogAppend?.Invoke(this, new LogAppendEventArgs(this, line));
+			
 			if (_logs.Count > 10000)
 			{
 				_logs.RemoveRange(0, _logs.Count - 10000);

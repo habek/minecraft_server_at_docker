@@ -37,13 +37,13 @@ namespace MinecraftServerManager.Windows
 
 				UpdateServerListViewItem(serverItem);
 				lvServers.Items.Add(serverItem);
-				server.OnLogAppend = (server, line) =>
+				server.OnLogAppend += (server, e) =>
 				{
 					if (IsDisposed)
 					{
 						return;
 					};
-					Invoke(OnLogAppend, server, line);
+					Invoke(OnLogAppend, server, e.Line);
 				};
 				server.OnDataChanged = (server, changedData) =>
 				{
