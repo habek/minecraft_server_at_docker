@@ -18,14 +18,21 @@ function App() {
 						>
 							Learn React
 						</a>
-						<br/>
+						<br />
 						<a href="/api/swagger/index.html">Api</a>
 					</Col>
 				</Row>
 				<Row>
 					<Col xs="2"><ServersList /></Col>
 					<Col xs="10">
-						<ServerConsoleLogs />
+						<code className="lh-sm" >
+							<pre>
+								<div className=" overflow-auto" style={{ "maxHeight": "700px" }}>
+									<ServerConsoleLogs />
+									<ServerConsoleLogStream />
+								</div>
+							</pre>
+						</code>
 					</Col>
 				</Row>
 			</Container>
@@ -33,23 +40,42 @@ function App() {
 	);
 }
 
-function ServerConsoleLogs() {
+function ServerConsoleLogs(props: object) {
+	const serverName = useSelectedGameServerName();
+	const [lines, setLines] = useState<string[]>([])
+	const endRef = useRef<any>(null);
+	const list = React.Children.toArray(lines.map((l) => { return (<div>{l}</div>) }))
+	useEffect(() => {
+		ServerClient.ReadLogs(serverName!)
+			.then(logs => {
+				setLines(logs)
+			})
+	}, [serverName])
+	useEffect(() => {
+		endRef.current.scrollIntoView()
+	}, [lines])
+	return (<div>{list}<div ref={endRef} /></div>)
+}
+
+function ServerConsoleLogStream(props: object) {
 	const serverName = useSelectedGameServerName();
 	const logDest = useRef<any>(null);
+
 	useEffect(() => {
 		const handler = (line: string) => {
 			console.debug(`console line: ${line}`);
 			const el = document.createElement('div')
-			el.className ="text-start lh-1"
+			el.className = "text-start"
 			el.innerHTML = line;
 			console.info(logDest.current?.appendChild(el));
+			logDest.current.scrollIntoView()
 		}
 		ServerClient.subscribe(serverName as string, handler);
 		return () => {
 			ServerClient.unsubscribe(serverName as string, handler);
 		}
 	}, [serverName])
-	return (<code><pre><div ref={logDest} className="lh-sm" >Tu są logi<br />i druga linia</div></pre></code>)
+	return (<div ref={logDest}></div>)
 }
 
 function useAllServerNames() {
@@ -113,21 +139,5 @@ function ServersList() {
 		</ListGroup>
 	);
 };
-
-
-//function checkSignalR(cb: CallableFunction) {
-//	if (signalrConnection.state === "Connected") {
-//		cb(signalrConnection)
-//		return;
-//	}
-//	setTimeout(() => { checkSignalR(cb) }, 100);
-//}
-//function useSignalrConnection() {
-//	const [connection, setConnection] = useState<any>(null)
-//	useEffect(() => {
-//		checkSignalR(setConnection)
-//	}, []);
-//	return connection;
-//}
 
 export default App;

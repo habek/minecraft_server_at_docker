@@ -2,7 +2,6 @@ import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
 
 const events = require('events');
 const signalR = require("@microsoft/signalr");
-//import { ISubscription } from '@microsoft/signalr';
 
 const subscribers: any = {}
 const subscribedServerNames: string[] = []
@@ -79,6 +78,17 @@ class ServerProxy extends events.EventEmitter {
 			return;
 		}
 		subscribers[serverName] = subscribers[serverName].filter((func: (line: string) => void) => func !== action)
+	}
+
+	async ReadLogs(serverName: string): Promise<string[]> {
+		try {
+			const response = await fetch(`/api/GameServer/Logs/${encodeURIComponent(serverName)}`, { method: "GET" });
+			var data = response.json() as unknown as Promise<string[]>
+			return data;
+		} catch (err) {
+			console.error(err);
+			return []
+		}
 	}
 }
 

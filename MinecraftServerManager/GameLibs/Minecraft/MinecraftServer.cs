@@ -47,7 +47,7 @@ namespace MinecraftServerManager.Minecraft
 		public string Status { get; private set; } = "Unknown";
 		public string Name { get; private set; } = "Unknown";
 		public string Id { get; internal set; } = "Unknown";
-		public IEnumerable<object> Logs => _logs;
+		public IEnumerable<string> Logs => _logs;
 
 		public static string LineSeparator { get => "\n"; }
 
