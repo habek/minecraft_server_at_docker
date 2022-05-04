@@ -1,3 +1,5 @@
+import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
+
 const events = require('events');
 const signalR = require("@microsoft/signalr");
 //import { ISubscription } from '@microsoft/signalr';
@@ -5,32 +7,50 @@ const signalR = require("@microsoft/signalr");
 const subscribers: any = {}
 const subscribedServerNames: string[] = []
 
+class RetryPolicy implements IRetryPolicy {
+	nextRetryDelayInMilliseconds(retryContext: RetryContext): number | null {
+		return 5000;
+	}
+}
+
 class ServerProxy extends events.EventEmitter {
 
 	constructor(url: string) {
 		super()
 		this.signalrConnection = new signalR.HubConnectionBuilder()
 			.withUrl(url)
-			.withAutomaticReconnect()
+			.withAutomaticReconnect(new RetryPolicy())
 			.configureLogging(signalR.LogLevel.Information)
 			.build();
-		this.signalrConnection.start().then(() => this.registerConsoleEvents())
+		this.signalrConnection.start().then(() => this.registerConsoleEvents(false))
+		this.signalrConnection.onreconnected(() => this.registerConsoleEvents(true))
 		this.signalrConnection.on("ServerListChanged", (serverIds: string[]) => {
 			console.debug(`Servers: ${serverIds}`);
 			this.serverNames = serverIds;
 			this.emit('ServerListChanged', serverIds)
+
 		});
+		//	JavaScript
+
+		//	Copy
+		//	$.connection.hub.disconnected(function () {
+		//		if ($.connection.hub.lastError) { alert("Disconnected. Reason: " + $.connection.hub.lastError.message); }
+		//	});
 	}
-	signalrConnection: any;
+	signalrConnection: HubConnection;
 	serverNames: string[] = []
-	registerConsoleEvents() {
+	registerConsoleEvents(force: boolean) {
+		if (force) {
+			subscribedServerNames.length = 0
+		}
 		if (this.signalrConnection.state !== "Connected") {
 			return;
 		}
-		for(const serverName in subscribers){
+		for (const serverName in subscribers) {
 			if (subscribers[serverName].length > 0) {
 				if (subscribedServerNames.includes(serverName)) {
 					console.info("TODO: unregister console")
+					//const [subscription, setSubscription] = useState<ISubscription<string>>(null as unknown as ISubscription<string>)
 				}
 			}
 			if (!subscribedServerNames.includes(serverName)) {
@@ -52,13 +72,13 @@ class ServerProxy extends events.EventEmitter {
 			subscribers[serverName] = []
 		}
 		subscribers[serverName].push(action)
-		this.registerConsoleEvents()
+		this.registerConsoleEvents(false)
 	}
 	unsubscribe(serverName: string, action: (line: string) => void) {
 		if (!subscribers[serverName]) {
 			return;
 		}
-		subscribers[serverName].filter((func: (line: string) => void) => func !== action)
+		subscribers[serverName] = subscribers[serverName].filter((func: (line: string) => void) => func !== action)
 	}
 }
 

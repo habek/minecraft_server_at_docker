@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { Badge, Col, Container, ListGroup, ListGroupItem, Row } from 'reactstrap';
 import { StringParam, useQueryParam } from 'use-query-params';
@@ -9,20 +9,23 @@ function App() {
 		<div className="App">
 			<Container fluid="true">
 				<Row>
-					<Col xs="2"><ServersList /></Col>
 					<Col>
-						<header className="App-header">
-							<a
-								className="App-link"
-								href="https://reactjs.org"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								Learn React
-							</a>
-							<a href="/api/swagger/index.html">Api</a>
-							<ServerConsoleLogs />
-						</header>
+						<a
+							className="App-link"
+							href="https://reactjs.org"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Learn React
+						</a>
+						<br/>
+						<a href="/api/swagger/index.html">Api</a>
+					</Col>
+				</Row>
+				<Row>
+					<Col xs="2"><ServersList /></Col>
+					<Col xs="10">
+						<ServerConsoleLogs />
 					</Col>
 				</Row>
 			</Container>
@@ -31,45 +34,22 @@ function App() {
 }
 
 function ServerConsoleLogs() {
-	const [lines, setLines] = useState<string[]>([])
 	const serverName = useSelectedGameServerName();
-	const latestLines = useRef<string[]>([])
-	//const [subscription, setSubscription] = useState<ISubscription<string>>(null as unknown as ISubscription<string>)
-	//const connection = useSignalrConnection();
-
-
+	const logDest = useRef<any>(null);
 	useEffect(() => {
 		const handler = (line: string) => {
 			console.debug(`console line: ${line}`);
-			latestLines.current.push(line);
-			setLines(latestLines.current);
+			const el = document.createElement('div')
+			el.className ="text-start lh-1"
+			el.innerHTML = line;
+			console.info(logDest.current?.appendChild(el));
 		}
 		ServerClient.subscribe(serverName as string, handler);
 		return () => {
 			ServerClient.unsubscribe(serverName as string, handler);
 		}
-		//	if (!subscription && connection) {
-		//		console.log("Subscribe................")
-		//		const subs = connection.stream("ReadConsole", serverName).subscribe({
-		//			next: (line: string) => {
-		//				console.debug(`console line: ${line}`);
-		//				latestLines.current.push(line);
-		//				setLines(latestLines.current);
-		//			},
-		//			complete: () => { },
-		//			error: (err: string) => { }
-		//		})
-		//		setSubscription(subs);
-		//	}
-		//	return () => {
-		//		if (subscription) {
-		//			console.log("Unsubscribe................")
-		//			subscription.dispose()
-		//			setSubscription(null as unknown as ISubscription<string>)
-		//		}
-		//	}
 	}, [serverName])
-	return (<code><pre>ala{lines.map(l => (<p>{l}</p>))}</pre></code>)
+	return (<code><pre><div ref={logDest} className="lh-sm" >Tu są logi<br />i druga linia</div></pre></code>)
 }
 
 function useAllServerNames() {
