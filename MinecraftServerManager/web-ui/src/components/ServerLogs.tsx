@@ -33,9 +33,9 @@ function ServerConsoleLogStream(props: object) {
 			console.info(logDest.current?.appendChild(el));
 			logDest.current.scrollIntoView()
 		}
-		ServerClient.subscribe(serverName as string, handler);
+		ServerClient.subscribeLogs(serverName as string, handler);
 		return () => {
-			ServerClient.unsubscribe(serverName as string, handler);
+			ServerClient.unsubscribeLogs(serverName as string, handler);
 		}
 	}, [serverName])
 	return (<div ref={logDest}></div>)
@@ -52,7 +52,6 @@ function ServerLogs() {
 			</pre>
 		</code>
 	)
-
 }
 
 export { ServerLogs }

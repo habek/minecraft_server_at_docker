@@ -16,8 +16,17 @@ namespace web_api.Hubs
 			_serversManager = serversManager;
 			serversManager.OnServerListChanged = () =>
 			{
+				foreach (var server in _serversManager.Servers)
+				{
+					server.OnDataChanged = OnServerDataChanged;
+				}
 				_ = SendServerListUpdate();
 			};
+		}
+
+		private void OnServerDataChanged(MinecraftServer server, ChangedData changedData)
+		{
+			Clients.All.SendAsync("DataChanged", server.Name, changedData.ToString());
 		}
 
 		private async Task SendServerListUpdate()

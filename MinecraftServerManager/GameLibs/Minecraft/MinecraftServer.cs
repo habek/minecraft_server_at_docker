@@ -1,5 +1,6 @@
 ﻿using Docker.DotNet;
 using Docker.DotNet.Models;
+using GameLibs.Minecraft.Users;
 using MinecraftServerManager.Communication.Docker;
 using MinecraftServerManager.Minecraft.Users;
 using Newtonsoft.Json;
@@ -400,7 +401,7 @@ namespace MinecraftServerManager.Minecraft
 			return null;
 		}
 
-		public async Task UpdatePermissions()
+		public async Task<List<Permission>> UpdatePermissions()
 		{
 			try
 			{
@@ -414,11 +415,13 @@ namespace MinecraftServerManager.Minecraft
 					}
 				}
 				OnDataChanged?.Invoke(this, ChangedData.Users);
+				return permissions;
 			}
 			catch (Exception ex)
 			{
 				Log.Error(ex, "Updating permissions error");
 			}
+			return new List<Permission>();
 		}
 
 		public async Task<CommandStream> Attach()
@@ -507,7 +510,7 @@ namespace MinecraftServerManager.Minecraft
 			//else 
 			if (line.Contains("Version"))
 			{
-				if(ConsoleDataParser.IsVersionInformation(line, out string? version))
+				if (ConsoleDataParser.IsVersionInformation(line, out string? version))
 				{
 					_minecraftVersion = version;
 					OnDataChanged?.Invoke(this, ChangedData.Configuration);
@@ -531,7 +534,7 @@ namespace MinecraftServerManager.Minecraft
 				}
 			}
 			OnLogAppend?.Invoke(this, new LogAppendEventArgs(this, line));
-			
+
 			if (_logs.Count > 10000)
 			{
 				_logs.RemoveRange(0, _logs.Count - 10000);
@@ -581,6 +584,34 @@ namespace MinecraftServerManager.Minecraft
 				}
 			}
 			throw new FileNotFoundException(parameters.Path);
+		}
+
+		public async Task<IEnumerable<GameUserInfo>> GetUserInfos()
+		{
+			var permissions = await UpdatePermissions();
+			var connectedUsers = ConnectedUsers;
+			var xuids = permissions.Select(permission => permission.Xuid).Concat(connectedUsers.Select(user => user.Xuid)).Distinct();
+			var userInfos = new List<GameUserInfo>();
+			foreach (var xuid in xuids)
+			{
+				if (xuid == null)
+				{
+					continue;
+				}
+				var user = connectedUsers.FirstOrDefault(user => user.Xuid == xuid);
+				if (user == null)
+				{
+					user = new MinecraftUser { UserName = xuid, Xuid = xuid };
+				}
+				var userInfo = new GameUserInfo(user);
+				var permission = permissions.FirstOrDefault(permission => permission.Xuid == xuid);
+				if (permission != null)
+				{
+					userInfo.Permission = permission.PermissionName;
+				}
+				userInfos.Add(userInfo);
+			}
+			return userInfos;
 		}
 	}
 }

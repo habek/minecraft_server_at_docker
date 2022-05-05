@@ -11,6 +11,23 @@ class RetryPolicy implements IRetryPolicy {
 		return 5000;
 	}
 }
+enum ChangedDataType {
+	Users = "Users",
+	State = "State",
+	Configuration = "Configuration"
+}
+
+class XBoxUser {
+	userName: string | undefined
+	xuid: string | undefined
+}
+
+class UserInfo {
+	isConnected: boolean | undefined
+	user: XBoxUser | undefined
+	permission: string | undefined
+}
+
 
 class ServerProxy extends events.EventEmitter {
 
@@ -29,6 +46,9 @@ class ServerProxy extends events.EventEmitter {
 			this.emit('ServerListChanged', serverIds)
 
 		});
+		this.signalrConnection.on("DataChanged", (serverName: string, changedData: ChangedDataType) => {
+			this.emit(changedData + "DataChanged_" + serverName);
+		})
 		//	JavaScript
 
 		//	Copy
@@ -66,14 +86,14 @@ class ServerProxy extends events.EventEmitter {
 			}
 		}
 	}
-	subscribe(serverName: string, action: (line: string) => void) {
+	subscribeLogs(serverName: string, action: (line: string) => void) {
 		if (!subscribers[serverName]) {
 			subscribers[serverName] = []
 		}
 		subscribers[serverName].push(action)
 		this.registerConsoleEvents(false)
 	}
-	unsubscribe(serverName: string, action: (line: string) => void) {
+	unsubscribeLogs(serverName: string, action: (line: string) => void) {
 		if (!subscribers[serverName]) {
 			return;
 		}
@@ -90,8 +110,20 @@ class ServerProxy extends events.EventEmitter {
 			return []
 		}
 	}
+	async GetUsers(serverName: string): Promise<UserInfo[]> {
+		try {
+			const response = await fetch(`/api/GameServer/Users/${encodeURIComponent(serverName)}`, { method: "GET" });
+			var data = response.json() as unknown as Promise<UserInfo[]>
+			return data;
+		} catch (err) {
+			console.error(err);
+			return []
+		}
+	}
+
 }
 
 const ServerClient = new ServerProxy("/api/events");
 
 export default ServerClient;
+export { ChangedDataType, UserInfo }

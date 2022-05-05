@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GameLibs.Minecraft.Users;
+using Microsoft.AspNetCore.Mvc;
 using MinecraftServerManager.Minecraft;
 using System.Web;
 
@@ -29,17 +30,35 @@ namespace web_api.Controllers
 		{
 			return "value";
 		}
-		[HttpGet("Logs/{serverName}")]
-		public ActionResult<IEnumerable<string>> Get(string serverName)
+
+		private MinecraftServer? GetServer(string serverName)
 		{
 			serverName = HttpUtility.UrlDecode(serverName);
-			var server = _serversManager.GetMinecraftServer(serverName);
+			return _serversManager.GetMinecraftServer(serverName);
+		}
+
+		[HttpGet("Logs/{serverName}")]
+		public ActionResult<IEnumerable<string>> GetLogs(string serverName)
+		{
+			var server = GetServer(serverName);
 			if (server == null)
 			{
 				return NotFound();
 			}
 			return Ok(server.Logs);
 		}
+
+		[HttpGet("Users/{serverName}")]
+		public async Task<ActionResult<IEnumerable<GameUserInfo>>> GetUsers(string serverName)
+		{
+			var server = GetServer(serverName);
+			if (server == null)
+			{
+				return NotFound();
+			}
+			return Ok(await server.GetUserInfos());
+		}
+
 
 		// POST api/<GameServerController>
 		[HttpPost]

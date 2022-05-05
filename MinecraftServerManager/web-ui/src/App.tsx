@@ -5,6 +5,7 @@ import { ServersList } from './components/ServersList';
 import { ServerLogs } from './components/ServerLogs';
 import { useSelectedGameServerName } from './hooks/gameServersHooks';
 import { GameServerContext } from './contexts';
+import { ServerUsers } from './components/ServerUsers';
 
 function App() {
 	const serverName = useSelectedGameServerName();
@@ -14,8 +15,9 @@ function App() {
 				<Container fluid="true">
 					<Row>
 						<Col xs="2"><ServersList /></Col>
-						{/*	<Col xs="10">*/}
-						{/*	</Col>*/}
+						<Col xs="10">
+							<ServerUsers />
+						</Col>
 					</Row>
 					<Row>
 						<Col>
