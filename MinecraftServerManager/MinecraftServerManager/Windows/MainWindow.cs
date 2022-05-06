@@ -209,7 +209,7 @@ namespace MinecraftServerManager.Windows
 
 		private void BtnBackup_Click(object sender, EventArgs e)
 		{
-			CurrentServer?.Backup(Program.Settings.GetBackupFilePath(CurrentServer.Name));
+			CurrentServer?.Backup(Program.Settings.GetBackupFilePath(CurrentServer.Id));
 		}
 
 		OpenFileDialog? openFileDialog;

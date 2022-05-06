@@ -22,16 +22,17 @@ function ServerConsoleLogs(props: object) {
 
 function ServerConsoleLogStream(props: object) {
 	const serverName = useSelectedGameServerName();
-	const logDest = useRef<any>(null);
+	const logDest = useRef<any>(null); 
 
 	useEffect(() => {
 		const handler = (line: string) => {
-			console.debug(`console line: ${line}`);
+			console.debug(`console line: ${line}`); 
 			const el = document.createElement('div')
 			el.className = "text-start"
 			el.innerHTML = line;
-			console.info(logDest.current?.appendChild(el));
-			logDest.current.scrollIntoView()
+			var added = logDest.current?.appendChild(el);
+			console.info(added);
+			added.scrollIntoView()
 		}
 		ServerClient.subscribeLogs(serverName as string, handler);
 		return () => {

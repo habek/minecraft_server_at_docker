@@ -1,8 +1,7 @@
-import { userInfo } from "os"
 import { useEffect, useState } from "react"
 import { Table } from "reactstrap"
 import { useSelectedGameServerName } from "../hooks/gameServersHooks"
-import ServerClient, { ChangedDataType, UserInfo } from "../libs/ApiClient"
+import ServerClient, { UserInfo } from "../libs/ApiClient"
 
 function ServerUsers() {
 	const serverName = useSelectedGameServerName()
@@ -21,7 +20,7 @@ function ServerUsers() {
 
 	}, [serverName])
 
-	const userRows = userInfos.map(userInfo => (<tr>
+	const userRows = userInfos.map(userInfo => (<tr key={userInfo.user?.xuid}>
 		<td>
 			{userInfo.isConnected ? "Online": ""}
 		</td>

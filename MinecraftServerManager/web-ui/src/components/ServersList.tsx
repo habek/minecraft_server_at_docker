@@ -15,7 +15,7 @@ function ServerButton(props: ServerButtonParams) {
 		window.location.href = window.location.href
 	}
 	return (
-		<div onClick={setParam} className="text-break"> 
+		<div onClick={setParam} className="text-break">
 			{props.serverName}
 			<Badge pill>1</Badge>
 		</div>

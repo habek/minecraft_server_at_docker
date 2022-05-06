@@ -21,7 +21,7 @@ namespace web_api.Controllers
 		[HttpGet]
 		public IEnumerable<string> Get()
 		{
-			return _serversManager.Servers.Select(x => x.Name);
+			return _serversManager.Servers.Select(x => x.Id);
 		}
 
 		// GET api/<GameServerController>/5
@@ -31,16 +31,16 @@ namespace web_api.Controllers
 			return "value";
 		}
 
-		private MinecraftServer? GetServer(string serverName)
+		private MinecraftServer? GetServer(string serverId)
 		{
-			serverName = HttpUtility.UrlDecode(serverName);
-			return _serversManager.GetMinecraftServer(serverName);
+			serverId = HttpUtility.UrlDecode(serverId);
+			return _serversManager.GetMinecraftServer(serverId);
 		}
 
-		[HttpGet("Logs/{serverName}")]
-		public ActionResult<IEnumerable<string>> GetLogs(string serverName)
+		[HttpGet("Logs/{serverId}")]
+		public ActionResult<IEnumerable<string>> GetLogs(string serverId)
 		{
-			var server = GetServer(serverName);
+			var server = GetServer(serverId);
 			if (server == null)
 			{
 				return NotFound();
@@ -48,10 +48,10 @@ namespace web_api.Controllers
 			return Ok(server.Logs);
 		}
 
-		[HttpGet("Users/{serverName}")]
-		public async Task<ActionResult<IEnumerable<GameUserInfo>>> GetUsers(string serverName)
+		[HttpGet("Users/{serverId}")]
+		public async Task<ActionResult<IEnumerable<GameUserInfo>>> GetUsers(string serverId)
 		{
-			var server = GetServer(serverName);
+			var server = GetServer(serverId);
 			if (server == null)
 			{
 				return NotFound();

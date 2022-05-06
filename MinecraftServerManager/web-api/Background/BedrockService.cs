@@ -10,6 +10,7 @@ namespace web_api.Background
 		private readonly SettingsModel _settings;
 		private readonly MinecraftUsersManager _minecraftUsersManager;
 		ServersManager _serversManager;
+		private CancellationTokenSource _refreshServerListCts = new CancellationTokenSource();
 
 		public BedrockService(SettingsModel settings, MinecraftUsersManager minecraftUsersManager, ServersManager serversManager)
 		{
@@ -18,13 +19,22 @@ namespace web_api.Background
 			_serversManager = serversManager;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			await _serversManager.RefreshServersList();
+			Task.Run(async () =>
+			{
+				while (!_refreshServerListCts.IsCancellationRequested)
+				{
+					await _serversManager.RefreshServersList();
+					await Task.Delay(60000, _refreshServerListCts.Token);
+				}
+			});
+			return Task.CompletedTask;
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
+			_refreshServerListCts.Cancel();
 			_settings.KnownUsers.Clear();
 			_settings.KnownUsers.AddRange(_minecraftUsersManager.GetAllUsers().Where(user => user.HasXuid()));
 			_settings.Save();

@@ -21,23 +21,25 @@ namespace MinecraftServerManager.Minecraft
 			await _dockerHost.RefreshContainerList();
 			foreach (var container in _dockerHost.GetContainerList())
 			{
-				if (!_minecraftServers.TryGetValue(container.ID, out MinecraftServer? server))
+				var serverId = MinecraftServer.GetServerIdFromContainer(container);
+
+				if (!_minecraftServers.TryGetValue(serverId, out MinecraftServer? server))
 				{
-					if (!container.Names.Any(n => n.Contains("test")))
-					{
-						//continue;
-					}
 					server = new MinecraftServer(_minecraftUsersManager, _dockerHost, container);
-					_minecraftServers[server.Name] = server;
+					_minecraftServers[serverId] = server;
+				}
+				else
+				{
+					server.UpdateContainer(container);
 				}
 			}
 			OnServerListChanged?.Invoke();
 		}
 		public IList<MinecraftServer> Servers => _minecraftServers.Values.ToList();
 
-		public MinecraftServer? GetMinecraftServer(string serverName)
+		public MinecraftServer? GetMinecraftServer(string serverId)
 		{
-			_minecraftServers.TryGetValue(serverName, out MinecraftServer? server);
+			_minecraftServers.TryGetValue(serverId, out MinecraftServer? server);
 			return server;
 		}
 

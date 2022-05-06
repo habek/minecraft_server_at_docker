@@ -26,23 +26,23 @@ namespace web_api.Hubs
 
 		private void OnServerDataChanged(MinecraftServer server, ChangedData changedData)
 		{
-			Clients.All.SendAsync("DataChanged", server.Name, changedData.ToString());
+				Clients.All.SendAsync("DataChanged", server.Id, changedData.ToString());
 		}
 
 		private async Task SendServerListUpdate()
 		{
-			await Clients.All.SendAsync("ServerListChanged", _serversManager.Servers.Select(s => s.Name).OrderBy(name => name), CancellationToken.None);
+			await Clients.All.SendAsync("ServerListChanged", _serversManager.Servers.Select(s => s.Id).OrderBy(name => name), CancellationToken.None);
 		}
 
 		public override async Task OnConnectedAsync()
 		{
 			await base.OnConnectedAsync();
-			await Clients.Caller.SendAsync("ServerListChanged", _serversManager.Servers.Select(s => s.Name).OrderBy(name => name), CancellationToken.None);
+			await Clients.Caller.SendAsync("ServerListChanged", _serversManager.Servers.Select(s => s.Id).OrderBy(name => name), CancellationToken.None);
 		}
 
-		public async IAsyncEnumerable<string> ReadConsole(string serverName, [EnumeratorCancellation] CancellationToken cancellationToken)
+		public async IAsyncEnumerable<string> ReadConsole(string serverId, [EnumeratorCancellation] CancellationToken cancellationToken)
 		{
-			var server = _serversManager.GetMinecraftServer(serverName);
+			var server = _serversManager.GetMinecraftServer(serverId);
 			if (server == null)
 			{
 				yield break;

@@ -24,34 +24,50 @@ namespace MinecraftServerManager.Minecraft
 		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
 		public const string worldFolderOnContainer = "/bedrock/worlds";
 		private readonly List<string> _logs = new List<string>();
+		private CancellationTokenSource _logsTaskCancelationTokenSource;
 		private readonly MemoryStream _logBuffer = new MemoryStream();
 		private ConcurrentDictionary<string, MinecraftUser> _connectedUsers = new();
 		private readonly DockerClient _dockerClient;
-		private readonly string _containerId;
+		private string _containerId;
 		private readonly ConcurrentDictionary<string, Permission> _permissions = new ConcurrentDictionary<string, Permission>();
 
 		private readonly MinecraftUsersManager _minecraftUsersManager;
 
-		public MinecraftServer(MinecraftUsersManager minecraftUsersManager, DockerHost dockerHost, ContainerListResponse container)
-		{
-			_dockerClient = dockerHost.DockerClient;
-			_containerId = container.ID;
-			Name = container.Names.FirstOrDefault() ?? container.ID;
-			Id = container.ID;
-			State = container.State;
-			Status = container.Status;
-			_ = ConnectAsync(CancellationToken.None);
-			_minecraftUsersManager = minecraftUsersManager;
-		}
-
 		public string State { get; private set; } = "Unknown";
 		public string Status { get; private set; } = "Unknown";
-		public string Name { get; private set; } = "Unknown";
-		public string Id { get; internal set; } = "Unknown";
+		public string Id  {get;private set;}
 		public IEnumerable<string> Logs => _logs;
 
 		public static string LineSeparator { get => "\n"; }
 
+		public MinecraftServer(MinecraftUsersManager minecraftUsersManager, DockerHost dockerHost, ContainerListResponse container)
+		{
+			Id = GetServerIdFromContainer(container);
+			_dockerClient = dockerHost.DockerClient;
+			_containerId = container.ID;
+			State = container.State;
+			Status = container.Status;
+			_logsTaskCancelationTokenSource = new CancellationTokenSource();
+			_ = ConnectAsync(_logsTaskCancelationTokenSource.Token);
+			_minecraftUsersManager = minecraftUsersManager;
+		}
+
+		public void UpdateContainer(ContainerListResponse container)
+		{
+			if(_containerId == container.ID)
+			{
+				return;
+			}
+			_containerId = container.ID;
+			_logsTaskCancelationTokenSource.Cancel();
+			_logsTaskCancelationTokenSource = new CancellationTokenSource();
+			_ = ConnectAsync(_logsTaskCancelationTokenSource.Token);
+		}
+
+		public static string GetServerIdFromContainer(ContainerListResponse container)
+		{
+			return container.Names.FirstOrDefault() ?? container.ID;
+		}
 
 		[Flags]
 		public enum ChangedData
@@ -82,7 +98,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public override string ToString()
 		{
-			var s = Name.TrimStart('/');
+			var s = Id.TrimStart('/');
 			if (!_connectedUsers.IsEmpty)
 			{
 				s += $" ({_connectedUsers.Count})";
