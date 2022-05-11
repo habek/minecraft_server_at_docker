@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Badge, ListGroup, ListGroupItem } from "reactstrap";
 import { StringParam, useQueryParam } from "use-query-params";
-import { useAllServerNames, useSelectedGameServerName } from "../hooks/gameServersHooks";
+import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
 
 
 interface ServerButtonParams {
@@ -9,15 +10,18 @@ interface ServerButtonParams {
 
 function ServerButton(props: ServerButtonParams) {
 	const setQueryParam = useQueryParam("serverName", StringParam)[1];
+	const activeUsersCount = useNumberOfActivePlayers(props.serverName)??11
 
 	const setParam = () => {
 		setQueryParam(props.serverName)
 		window.location.href = window.location.href
 	}
+
+
 	return (
 		<div onClick={setParam} className="text-break">
 			{props.serverName}
-			<Badge pill>1</Badge>
+			<Badge pill>{activeUsersCount}</Badge>
 		</div>
 	);
 }

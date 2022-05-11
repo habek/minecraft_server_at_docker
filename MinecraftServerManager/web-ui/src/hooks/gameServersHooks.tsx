@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StringParam, useQueryParam } from "use-query-params";
-import ServerClient from "../libs/ApiClient";
+import ServerClient, { UserInfo } from "../libs/ApiClient";
 
 function useAllServerNames() {
 	const [serverList, setServerList] = useState<string[]>([]);
@@ -33,4 +33,20 @@ function useSelectedGameServerName(): string {
 	return serverName ?? "";
 }
 
-export { useAllServerNames, useSelectedGameServerName }
+function useNumberOfActivePlayers(serverId: string) {
+	const [activePlayersCount, setActivePlayersCount] = useState<number | undefined>(undefined)
+	useEffect(() => {
+		console.log("^^^^^^^^^^^^^^^^^^" + serverId, ServerClient.getServerInfo(serverId).usersNumber)
+		setActivePlayersCount(ServerClient.getServerInfo(serverId).usersNumber)
+		const hook = () => {
+			setActivePlayersCount(ServerClient.getServerInfo(serverId).usersNumber)
+		}
+		ServerClient.on("UsersDataChanged_" + serverId, hook)
+		return () => {
+			ServerClient.off("UsersDataChanged_" + serverId, hook)
+		}
+	}, [serverId])
+	return activePlayersCount
+}
+
+export { useAllServerNames, useSelectedGameServerName, useNumberOfActivePlayers }

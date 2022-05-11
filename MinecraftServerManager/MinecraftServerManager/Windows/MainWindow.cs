@@ -160,7 +160,7 @@ namespace MinecraftServerManager.Windows
 			listBox1.TopIndex = listBox1.Items.Count - 1;
 			listBox1.EndUpdate();
 			UpdateUserList(minecraftServer);
-			CurrentServer?.UpdatePermissions();
+			CurrentServer?.ReloadPermissionsInfo();
 			UpdateConfiguration(minecraftServer);
 		}
 

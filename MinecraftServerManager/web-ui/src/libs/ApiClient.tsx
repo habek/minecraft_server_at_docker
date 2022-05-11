@@ -3,7 +3,7 @@ import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
 const events = require('events');
 const signalR = require("@microsoft/signalr");
 
-const subscribers: any = {}
+const logListeners: any = {}
 const subscribedServerNames: string[] = []
 
 class RetryPolicy implements IRetryPolicy {
@@ -28,6 +28,17 @@ class UserInfo {
 	permission: string | undefined
 }
 
+class ServerInfo {
+	constructor(serverId: string) {
+		this.serverId = serverId;
+	}
+	serverId: string
+	usersNumber: number | undefined
+}
+
+class ServersInfo {
+	[serverId: string]: ServerInfo
+}
 
 class ServerProxy extends events.EventEmitter {
 
@@ -41,13 +52,29 @@ class ServerProxy extends events.EventEmitter {
 		this.signalrConnection.start().then(() => this.registerConsoleEvents(false))
 		this.signalrConnection.onreconnected(() => this.registerConsoleEvents(true))
 		this.signalrConnection.on("ServerListChanged", (serverIds: string[]) => {
-			console.debug(`Servers: ${serverIds}`);
+			console.debug(`ServerListChanged: ${serverIds}`);
 			this.serverNames = serverIds;
+			for (var serverId of serverIds) {
+				if (this.getServerInfo(serverId).usersNumber === undefined) {
+					this.GetUsers(serverId)
+				}
+			}
+			localStorage.setItem("ServersInfo", JSON.stringify(this.serversInfo))
 			this.emit('ServerListChanged', serverIds)
-
 		});
-		this.signalrConnection.on("DataChanged", (serverName: string, changedData: ChangedDataType) => {
-			this.emit(changedData + "DataChanged_" + serverName);
+		const serversInfo = localStorage.getItem("ServersInfo")
+		if (serversInfo !== null) {
+			this.serversInfo = JSON.parse(serversInfo);
+			for (var serverId in this.serversInfo) {
+				this.serversInfo[serverId].usersNumber = undefined
+				this.GetUsers(serverId)
+			}
+		}
+		this.signalrConnection.on("DataChanged", (serverId: string, changedData: ChangedDataType) => {
+			console.debug(`DataChanged: ${serverId}, ${changedData}`);
+			if (changedData === ChangedDataType.Users) {
+				this.GetUsers(serverId)
+			}
 		})
 		//	JavaScript
 
@@ -58,6 +85,15 @@ class ServerProxy extends events.EventEmitter {
 	}
 	signalrConnection: HubConnection;
 	serverNames: string[] = []
+	serversInfo: ServersInfo = new ServersInfo()
+	getServerInfo(serverId: string) {
+		var server = this.serversInfo[serverId]
+		if (!server) {
+			server = new ServerInfo(serverId)
+			this.serversInfo[serverId] = server
+		}
+		return server
+	}
 	registerConsoleEvents(force: boolean) {
 		if (force) {
 			subscribedServerNames.length = 0
@@ -65,8 +101,8 @@ class ServerProxy extends events.EventEmitter {
 		if (this.signalrConnection.state !== "Connected") {
 			return;
 		}
-		for (const serverName in subscribers) {
-			if (subscribers[serverName].length > 0) {
+		for (const serverName in logListeners) {
+			if (logListeners[serverName].length > 0) {
 				if (subscribedServerNames.includes(serverName)) {
 					console.info("TODO: unregister console")
 					//const [subscription, setSubscription] = useState<ISubscription<string>>(null as unknown as ISubscription<string>)
@@ -76,7 +112,7 @@ class ServerProxy extends events.EventEmitter {
 				this.signalrConnection.stream("ReadConsole", serverName).subscribe({
 					next: (line: string) => {
 						console.debug(`console ${serverName}, line: ${line}`);
-						subscribers[serverName].forEach((subscriber: (arg0: string) => any) => subscriber(line))
+						logListeners[serverName].forEach((subscriber: (arg0: string) => any) => subscriber(line))
 					},
 					complete: () => { },
 					error: (err: string) => {
@@ -87,17 +123,17 @@ class ServerProxy extends events.EventEmitter {
 		}
 	}
 	subscribeLogs(serverName: string, action: (line: string) => void) {
-		if (!subscribers[serverName]) {
-			subscribers[serverName] = []
+		if (!logListeners[serverName]) {
+			logListeners[serverName] = []
 		}
-		subscribers[serverName].push(action)
+		logListeners[serverName].push(action)
 		this.registerConsoleEvents(false)
 	}
 	unsubscribeLogs(serverName: string, action: (line: string) => void) {
-		if (!subscribers[serverName]) {
+		if (!logListeners[serverName]) {
 			return;
 		}
-		subscribers[serverName] = subscribers[serverName].filter((func: (line: string) => void) => func !== action)
+		logListeners[serverName] = logListeners[serverName].filter((func: (line: string) => void) => func !== action)
 	}
 
 	async ReadLogs(serverName: string): Promise<string[]> {
@@ -110,17 +146,24 @@ class ServerProxy extends events.EventEmitter {
 			return []
 		}
 	}
-	async GetUsers(serverName: string): Promise<UserInfo[]> {
+	async GetUsers(serverId: string): Promise<UserInfo[]> {
 		try {
-			const response = await fetch(`/api/GameServer/Users/${encodeURIComponent(serverName)}`, { method: "GET" });
-			var data = response.json() as unknown as Promise<UserInfo[]>
-			return data;
+			const response = await fetch(`/api/GameServer/Users/${encodeURIComponent(serverId)}`, { method: "GET" });
+			var userInfos = await (response.json() as unknown as Promise<UserInfo[]>)
+			var activeUsersNumber = 0;
+			for (var user of userInfos) {
+				if (user.isConnected) {
+					activeUsersNumber++
+				}
+			}
+			this.getServerInfo(serverId).usersNumber = activeUsersNumber
+			this.emit("UsersDataChanged_" + serverId, userInfos);
+			return userInfos;
 		} catch (err) {
 			console.error(err);
 			return []
 		}
 	}
-
 }
 
 const ServerClient = new ServerProxy("/api/events");

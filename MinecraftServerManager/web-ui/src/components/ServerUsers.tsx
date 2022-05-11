@@ -7,12 +7,9 @@ function ServerUsers() {
 	const serverName = useSelectedGameServerName()
 	const [userInfos, setUserInfos] = useState<UserInfo[]>([])
 	useEffect(() => {
-		const getUsers = () => {
-			ServerClient.GetUsers(serverName).then((userInfos: UserInfo[]) => {
-				setUserInfos(userInfos)
-			});
+		const getUsers = (userInfos: UserInfo[]) => {
+			setUserInfos(userInfos)
 		}
-		getUsers();
 		ServerClient.on("UsersDataChanged_" + serverName, getUsers);
 		return () => {
 			ServerClient.off("UsersDataChanged_" + serverName, getUsers);
@@ -22,7 +19,7 @@ function ServerUsers() {
 
 	const userRows = userInfos.map(userInfo => (<tr key={userInfo.user?.xuid}>
 		<td>
-			{userInfo.isConnected ? "Online": ""}
+			{userInfo.isConnected ? "Online" : ""}
 		</td>
 		<td >
 			{userInfo.user?.userName}

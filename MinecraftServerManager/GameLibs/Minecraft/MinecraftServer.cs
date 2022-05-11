@@ -374,7 +374,7 @@ namespace MinecraftServerManager.Minecraft
 		private async Task UpdateAllData()
 		{
 			await UpdateUsersList();
-			await UpdatePermissions();
+			await ReloadPermissionsInfo();
 		}
 
 		public async Task SendCommand(string command, CancellationToken cancellationToken)
@@ -417,20 +417,28 @@ namespace MinecraftServerManager.Minecraft
 			return null;
 		}
 
-		public async Task<List<Permission>> UpdatePermissions()
+		public async Task<List<Permission>> ReloadPermissionsInfo()
 		{
 			try
 			{
+				bool permissionsChanged = false;
 				var json = await LoadTextFile(PermissionsPathOnContainer);
 				var permissions = JsonConvert.DeserializeObject<List<Permission>>(json);
 				foreach (var permission in permissions)
 				{
 					if (permission.Xuid != null)
 					{
-						_permissions[permission.Xuid] = permission;
+						if(_permissions.TryGetValue(permission.Xuid, out Permission? prevPerm) && prevPerm != permission)
+						{
+							_permissions[permission.Xuid] = permission;
+							permissionsChanged = true;
+						}
 					}
 				}
-				OnDataChanged?.Invoke(this, ChangedData.Users);
+				if (permissionsChanged)
+				{
+					OnDataChanged?.Invoke(this, ChangedData.Users);
+				}
 				return permissions;
 			}
 			catch (Exception ex)
@@ -604,7 +612,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task<IEnumerable<GameUserInfo>> GetUserInfos()
 		{
-			var permissions = await UpdatePermissions();
+			var permissions = await ReloadPermissionsInfo();
 			var connectedUsers = ConnectedUsers;
 			var xuids = permissions.Select(permission => permission.Xuid).Concat(connectedUsers.Select(user => user.Xuid)).Distinct();
 			var userInfos = new List<GameUserInfo>();
@@ -614,12 +622,17 @@ namespace MinecraftServerManager.Minecraft
 				{
 					continue;
 				}
+				var isConnected = false;
 				var user = connectedUsers.FirstOrDefault(user => user.Xuid == xuid);
-				if (user == null)
+				if (user != null)
+				{
+					isConnected = true;
+				}
+				else
 				{
 					user = new MinecraftUser { UserName = xuid, Xuid = xuid };
 				}
-				var userInfo = new GameUserInfo(user);
+				var userInfo = new GameUserInfo(user) { IsConnected = isConnected };
 				var permission = permissions.FirstOrDefault(permission => permission.Xuid == xuid);
 				if (permission != null)
 				{
