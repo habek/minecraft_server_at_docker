@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StringParam, useQueryParam } from "use-query-params";
+import { useNavigate, useParams } from "react-router-dom";
 import ServerClient, { UserInfo } from "../libs/ApiClient";
 
 function useAllServerNames() {
@@ -19,28 +19,26 @@ function useAllServerNames() {
 }
 
 function useSelectedGameServerName(): string {
-	const [serverName, setServerName] = useQueryParam("serverName", StringParam)
+	const params = useParams()
 	const allServers = useAllServerNames();
-	if (allServers.length === 0) {
-		return serverName ?? "";
-	}
+	let serverName = params.serverId;
+
 	for (let name of allServers) {
 		if (name === serverName) {
 			return serverName;
 		}
 	}
-	setServerName(allServers[0]);
-	return serverName ?? "";
+	return "";
 }
 
 function useNumberOfActivePlayers(serverId: string) {
 	const [activePlayersCount, setActivePlayersCount] = useState<number | undefined>(undefined)
 	useEffect(() => {
-		console.log("^^^^^^^^^^^^^^^^^^" + serverId, ServerClient.getServerInfo(serverId).usersNumber)
-		setActivePlayersCount(ServerClient.getServerInfo(serverId).usersNumber)
 		const hook = () => {
+			//console.log("^^^^^^^^^^^^^^^^^^" + serverId, ServerClient.getServerInfo(serverId).usersNumber)
 			setActivePlayersCount(ServerClient.getServerInfo(serverId).usersNumber)
 		}
+		hook()
 		ServerClient.on("UsersDataChanged_" + serverId, hook)
 		return () => {
 			ServerClient.off("UsersDataChanged_" + serverId, hook)

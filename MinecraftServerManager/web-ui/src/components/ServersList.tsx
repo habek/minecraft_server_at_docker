@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge, ListGroup, ListGroupItem } from "reactstrap";
-import { StringParam, useQueryParam } from "use-query-params";
 import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
 
 
@@ -9,12 +9,13 @@ interface ServerButtonParams {
 }
 
 function ServerButton(props: ServerButtonParams) {
-	const setQueryParam = useQueryParam("serverName", StringParam)[1];
-	const activeUsersCount = useNumberOfActivePlayers(props.serverName)??11
+	const activeUsersCount = useNumberOfActivePlayers(props.serverName)
+	const navigate = useNavigate();
+
 
 	const setParam = () => {
-		setQueryParam(props.serverName)
-		window.location.href = window.location.href
+		navigate("/servers/" + encodeURIComponent(props.serverName))
+		//window.location.href = window.location.href
 	}
 
 

@@ -9,7 +9,10 @@ function ServerConsoleLogs(props: object) {
 	const endRef = useRef<any>(null);
 	const list = React.Children.toArray(lines.map((l) => { return (<div>{l}</div>) }))
 	useEffect(() => {
-		ServerClient.ReadLogs(serverName!)
+		if (!serverName) {
+			return;
+		}
+		ServerClient.ReadLogs(serverName)
 			.then(logs => {
 				setLines(logs)
 			})

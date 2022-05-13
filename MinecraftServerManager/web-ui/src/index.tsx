@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryParamProvider } from 'use-query-params';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(
 	document.getElementById('root') as HTMLElement
@@ -13,12 +12,28 @@ const root = ReactDOM.createRoot(
 root.render(
 	<React.StrictMode>
 		<BrowserRouter>
-			<QueryParamProvider>
-				<App />
-			</QueryParamProvider>
+			<Routes>
+				<Route path="/servers" element={<App />}>
+					<Route path=":serverId" element={<App />} />
+					<Route path="*" element={<p>There's nothing here!</p>}/>
+				</Route>
+
+				<Route path="*" element={<Redirect destination="/servers/ala" />} />
+			</Routes>
 		</BrowserRouter>
 	</React.StrictMode>
 );
+
+interface RedirectProps {
+	destination: string
+}
+function Redirect(props: RedirectProps) {
+	const navigate = useNavigate();
+	useEffect(() => {
+		navigate(props.destination)
+	});
+	return null
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
