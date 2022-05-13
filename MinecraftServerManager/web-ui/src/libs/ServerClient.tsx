@@ -1,4 +1,5 @@
 import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
+import { off } from "process";
 
 const events = require('events');
 const signalR = require("@microsoft/signalr");
@@ -123,6 +124,9 @@ class ServerProxy extends events.EventEmitter {
 		}
 	}
 	subscribeLogs(serverName: string, action: (line: string) => void) {
+		if (!serverName) {
+			return;
+		}
 		if (!logListeners[serverName]) {
 			logListeners[serverName] = []
 		}

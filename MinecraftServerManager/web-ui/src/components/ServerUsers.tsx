@@ -11,7 +11,9 @@ function ServerUsers() {
 			setUserInfos(userInfos)
 		}
 		ServerClient.on("UsersDataChanged_" + serverName, getUsers);
-		ServerClient.GetUsers(serverName)
+		if (serverName) {
+			ServerClient.GetUsers(serverName)
+		}
 		return () => {
 			ServerClient.off("UsersDataChanged_" + serverName, getUsers);
 		}

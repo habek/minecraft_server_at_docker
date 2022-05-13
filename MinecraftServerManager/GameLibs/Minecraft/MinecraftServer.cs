@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MinecraftServerManager.Minecraft
@@ -35,7 +36,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public string State { get; private set; } = "Unknown";
 		public string Status { get; private set; } = "Unknown";
-		public string Id  {get;private set;}
+		public string Id { get; private set; }
 		public IEnumerable<string> Logs => _logs;
 
 		public static string LineSeparator { get => "\n"; }
@@ -54,7 +55,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public void UpdateContainer(ContainerListResponse container)
 		{
-			if(_containerId == container.ID)
+			if (_containerId == container.ID)
 			{
 				return;
 			}
@@ -428,7 +429,7 @@ namespace MinecraftServerManager.Minecraft
 				{
 					if (permission.Xuid != null)
 					{
-						if(_permissions.TryGetValue(permission.Xuid, out Permission? prevPerm) && prevPerm != permission)
+						if (_permissions.TryGetValue(permission.Xuid, out Permission? prevPerm) && prevPerm != permission)
 						{
 							_permissions[permission.Xuid] = permission;
 							permissionsChanged = true;
@@ -503,11 +504,32 @@ namespace MinecraftServerManager.Minecraft
 					if (c == '\n')
 					{
 						var line = Encoding.UTF8.GetString(_logBuffer.ToArray());
-						_logs.Add(line);
-						if (line.Length > 30)
+						if (Regex.IsMatch(line, @"^\d\d\d\d-\d\d-\d\dT"))
 						{
+							int j = _logs.Count - 1;
+							while (j >= 0)
+							{
+								var cmp = line.CompareTo(_logs[j]);
+								if (cmp == 0)
+								{
+									var duplicatedLines = _logs.Count - j;
+									if (duplicatedLines > 1)
+									{
+										_logs.RemoveRange(j + 1, duplicatedLines - 1);
+									}
+									return;
+								}
+								if (cmp > 0)
+								{
+									break;
+								}
+								j--;
+							}
 							_timestamp = line.Substring(0, 30);
 						}
+
+						_logs.Add(line);
+
 						AppendLineToLog(line);
 						_logBuffer.Position = 0;
 						_logBuffer.SetLength(0);
@@ -516,6 +538,10 @@ namespace MinecraftServerManager.Minecraft
 					{
 						_logBuffer.WriteByte(c);
 					}
+				}
+				if (_logs.Count >= 10000)
+				{
+					_logs.RemoveRange(0, _logs.Count - 10000);
 				}
 			}
 		}
@@ -558,11 +584,6 @@ namespace MinecraftServerManager.Minecraft
 				}
 			}
 			OnLogAppend?.Invoke(this, new LogAppendEventArgs(this, line));
-
-			if (_logs.Count > 10000)
-			{
-				_logs.RemoveRange(0, _logs.Count - 10000);
-			}
 		}
 
 		public async Task<string> LoadTextFile(string pathInContainer)
