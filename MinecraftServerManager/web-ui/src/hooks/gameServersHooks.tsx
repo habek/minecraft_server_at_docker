@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import ServerClient, { UserInfo } from "../libs/ApiClient";
+import ServerClient, { UserInfo } from "../libs/ServerClient";
 
 function useAllServerNames() {
 	const [serverList, setServerList] = useState<string[]>([]);

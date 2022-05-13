@@ -157,6 +157,7 @@ class ServerProxy extends events.EventEmitter {
 				}
 			}
 			this.getServerInfo(serverId).usersNumber = activeUsersNumber
+			console.log("UsersDataChanged_" + serverId)
 			this.emit("UsersDataChanged_" + serverId, userInfos);
 			return userInfos;
 		} catch (err) {

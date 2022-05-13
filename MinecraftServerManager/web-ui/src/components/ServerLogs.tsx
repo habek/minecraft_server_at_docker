@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useSelectedGameServerName } from "../hooks/gameServersHooks";
-import ServerClient from "../libs/ApiClient";
+import ServerClient from "../libs/ServerClient";
 
 function ServerConsoleLogs(props: object) {
 	const serverName = useSelectedGameServerName();

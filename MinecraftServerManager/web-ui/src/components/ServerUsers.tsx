@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Table } from "reactstrap"
 import { useSelectedGameServerName } from "../hooks/gameServersHooks"
-import ServerClient, { UserInfo } from "../libs/ApiClient"
+import ServerClient, { UserInfo } from "../libs/ServerClient"
 
 function ServerUsers() {
 	const serverName = useSelectedGameServerName()
@@ -11,11 +11,15 @@ function ServerUsers() {
 			setUserInfos(userInfos)
 		}
 		ServerClient.on("UsersDataChanged_" + serverName, getUsers);
+		ServerClient.GetUsers(serverName)
 		return () => {
 			ServerClient.off("UsersDataChanged_" + serverName, getUsers);
 		}
 
 	}, [serverName])
+	if (!serverName) {
+		return (<div />)
+	}
 
 	const userRows = userInfos.map(userInfo => (<tr key={userInfo.user?.xuid}>
 		<td>
