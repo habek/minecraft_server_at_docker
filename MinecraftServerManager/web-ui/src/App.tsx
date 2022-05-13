@@ -1,10 +1,12 @@
 ﻿import './App.css';
-import { Col, Container, Navbar, NavbarBrand, NavbarToggler, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'reactstrap';
+import { Button, Col, Container, Navbar, NavbarBrand, NavbarText, NavbarToggler, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'reactstrap';
 import { ServersList } from './components/ServersList';
 import { ServerLogs } from './components/ServerLogs';
 import { ServerUsers } from './components/ServerUsers';
 import { useState } from 'react';
 import { useSelectedGameServerName } from './hooks/gameServersHooks';
+import { ServerBackupButton } from './components/ServerButtons';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
 	const [isServerListOpen, setIsServerListOpen] = useState(false)
@@ -24,6 +26,7 @@ function App() {
 					<NavbarBrand onClick={() => setIsServerListOpen(true)}>
 						{serverId}
 					</NavbarBrand>
+					<ServerBackupButton />
 				</Navbar>
 				<Row>
 					{/*<Col xs="2"><ServersList /></Col>*/}
@@ -51,6 +54,8 @@ function App() {
 					</Col>
 				</Row>
 			</Container>
+			<ToastContainer position="bottom-center" />
+
 		</div>
 	);
 }

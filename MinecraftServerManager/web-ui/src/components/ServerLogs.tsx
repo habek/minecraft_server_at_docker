@@ -25,11 +25,11 @@ function ServerConsoleLogs(props: object) {
 
 function ServerConsoleLogStream(props: object) {
 	const serverName = useSelectedGameServerName();
-	const logDest = useRef<any>(null); 
+	const logDest = useRef<any>(null);
 
 	useEffect(() => {
 		const handler = (line: string) => {
-			console.debug(`console line: ${line}`); 
+			console.debug(`console line: ${line}`);
 			const el = document.createElement('div')
 			el.className = "text-start"
 			el.innerHTML = line;
