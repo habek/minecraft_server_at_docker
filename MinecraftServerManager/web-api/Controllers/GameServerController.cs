@@ -1,5 +1,6 @@
 ﻿using GameLibs.Minecraft.Users;
 using Microsoft.AspNetCore.Mvc;
+using MinecraftServerManager;
 using MinecraftServerManager.Minecraft;
 using System.Web;
 
@@ -12,10 +13,14 @@ namespace web_api.Controllers
 	public class GameServerController : ControllerBase
 	{
 		private readonly ServersManager _serversManager;
+		private readonly SettingsModel _settings;
+		private readonly ILogger<GameServerController> _logger;
 
-		public GameServerController(ServersManager serversManager)
+		public GameServerController(ServersManager serversManager, SettingsModel settings, ILogger<GameServerController> logger)
 		{
 			_serversManager = serversManager;
+			_settings = settings;
+			_logger = logger;
 		}
 		// GET: api/<GameServerController>
 		[HttpGet]
@@ -76,6 +81,18 @@ namespace web_api.Controllers
 		[HttpDelete("{id}")]
 		public void Delete(int id)
 		{
+		}
+
+		[HttpGet("Actions/DoBackup/{serverId}")]
+		public async Task<ActionResult> DoBackup(string serverId)
+		{
+			var server = GetServer(serverId);
+			if (server == null)
+			{
+				return NotFound();
+			}
+			await server.Backup(_settings.GetBackupFilePath(server.Id));
+			return Ok();
 		}
 	}
 }

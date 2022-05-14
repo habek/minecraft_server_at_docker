@@ -494,6 +494,28 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
+		private bool IsDuplicate(string line)
+		{
+			if (Regex.IsMatch(line, @"^\d\d\d\d-\d\d-\d\dT"))
+			{
+				int j = _logs.Count - 1;
+				while (j >= 0)
+				{
+					var cmp = line.CompareTo(_logs[j]);
+					if (cmp == 0)
+					{
+						return true;
+					}
+					if (cmp > 0)
+					{
+						break;
+					}
+					j--;
+				}
+				_timestamp = line.Substring(0, 30);
+			}
+			return false;
+		}
 		private void AppendDataToLog(byte[] buffer, MultiplexedStream.ReadResult readResult)
 		{
 			lock (_logBuffer)
@@ -504,44 +526,24 @@ namespace MinecraftServerManager.Minecraft
 					if (c == '\n')
 					{
 						var line = Encoding.UTF8.GetString(_logBuffer.ToArray());
-						if (Regex.IsMatch(line, @"^\d\d\d\d-\d\d-\d\dT"))
-						{
-							int j = _logs.Count - 1;
-							while (j >= 0)
-							{
-								var cmp = line.CompareTo(_logs[j]);
-								if (cmp == 0)
-								{
-									var duplicatedLines = _logs.Count - j;
-									if (duplicatedLines > 1)
-									{
-										_logs.RemoveRange(j + 1, duplicatedLines - 1);
-									}
-									return;
-								}
-								if (cmp > 0)
-								{
-									break;
-								}
-								j--;
-							}
-							_timestamp = line.Substring(0, 30);
-						}
-
-						_logs.Add(line);
-
-						AppendLineToLog(line);
 						_logBuffer.Position = 0;
 						_logBuffer.SetLength(0);
+
+						if (!IsDuplicate(line))
+						{
+							_logs.Add(line);
+							if (_logs.Count >= 10000)
+							{
+								_logs.RemoveRange(0, _logs.Count - 10000);
+							}
+							AppendLineToLog(line);
+						}
+
 					}
 					else if (c != '\r')
 					{
 						_logBuffer.WriteByte(c);
 					}
-				}
-				if (_logs.Count >= 10000)
-				{
-					_logs.RemoveRange(0, _logs.Count - 10000);
 				}
 			}
 		}

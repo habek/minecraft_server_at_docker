@@ -54,7 +54,7 @@ function App() {
 					</Col>
 				</Row>
 			</Container>
-			<ToastContainer position="bottom-center" />
+			<ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
 
 		</div>
 	);

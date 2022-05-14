@@ -1,5 +1,6 @@
 import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
 import { off } from "process";
+import { toast } from "react-toastify";
 
 const events = require('events');
 const signalR = require("@microsoft/signalr");
@@ -118,6 +119,7 @@ class ServerProxy extends events.EventEmitter {
 					complete: () => { },
 					error: (err: string) => {
 						console.error(`console ${serverName}, error: ${err}`);
+						toast.error(JSON.stringify(err))
 					}
 				})
 			}
@@ -147,6 +149,7 @@ class ServerProxy extends events.EventEmitter {
 			return data;
 		} catch (err) {
 			console.error(err);
+			toast.error(JSON.stringify(err))
 			return []
 		}
 	}
@@ -166,6 +169,21 @@ class ServerProxy extends events.EventEmitter {
 			return userInfos;
 		} catch (err) {
 			console.error(err);
+			toast.error(JSON.stringify(err))
+			return []
+		}
+	}
+
+	async DoBackup(serverId: string) {
+		try {
+			var response = await fetch(`/api/GameServer/Actions/DoBackup/${encodeURIComponent(serverId)}`, { method: "GET" })
+			if (!response.ok) {
+				toast.error(JSON.stringify(response.statusText))
+			}
+		}
+		catch (err) {
+			console.error(err);
+			toast.error(JSON.stringify(err))
 			return []
 		}
 	}
