@@ -21,7 +21,7 @@ namespace MinecraftServerManager.Windows
 			InitializeComponent();
 			_minecraftServer = minecraftServer;
 			_filePath = filePath;
-			Text = $"Server: {minecraftServer.Name}, file: {_filePath}";
+			Text = $"Server: {minecraftServer.Id}, file: {_filePath}";
 			Task.Run(LoadFile);
 		}
 

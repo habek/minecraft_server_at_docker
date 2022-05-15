@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { Table } from "reactstrap"
 import { useSelectedGameServerName } from "../hooks/gameServersHooks"
 import ServerClient, { BackupInfo } from "../libs/ServerClient"
 
