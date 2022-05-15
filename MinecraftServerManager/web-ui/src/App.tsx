@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useSelectedGameServerName } from './hooks/gameServersHooks';
 import { ServerBackupButton } from './components/ServerButtons';
 import { ToastContainer } from 'react-toastify';
+import { ServerBackupsList } from './components/ServerBackupsList';
 
 function App() {
 	const [isServerListOpen, setIsServerListOpen] = useState(false)
@@ -41,16 +42,7 @@ function App() {
 				</Row>
 				<Row>
 					<Col>
-						<a
-							className="App-link"
-							href="https://reactjs.org"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Learn React
-						</a>
-						<br />
-						<a href="/api/swagger/index.html">Api</a>
+						<ServerBackupsList/>
 					</Col>
 				</Row>
 			</Container>

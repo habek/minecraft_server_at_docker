@@ -83,8 +83,8 @@ namespace web_api.Controllers
 		{
 		}
 
-		[HttpGet("Actions/DoBackup/{serverId}")]
-		public async Task<ActionResult> DoBackup(string serverId)
+		[HttpGet("Actions/Backup/{serverId}")]
+		public async Task<ActionResult> Backup(string serverId)
 		{
 			var server = GetServer(serverId);
 			if (server == null)
@@ -93,6 +93,47 @@ namespace web_api.Controllers
 			}
 			await server.Backup(_settings.GetBackupFilePath(server.Id));
 			return Ok();
+		}
+		[HttpGet("Actions/Restore/{serverId}/{backupName}")]
+		public async Task<ActionResult> Restore(string serverId, string backupName)
+		{
+			var server = GetServer(serverId);
+			if (server == null)
+			{
+				return NotFound("Unknown server");
+			}
+			await server.Restore(_settings.GetBackupFilePath(server.Id, backupName));
+			return Ok();
+		}
+
+		public class BackupInfo
+		{
+			public string? Name { get; set; }
+			public int Size { get; set; }
+		}
+		[HttpGet("{serverId}/backups")]
+		public ActionResult<List<BackupInfo>> ListBackups(string serverId)
+		{
+			var server = GetServer(serverId);
+			if (server == null)
+			{
+				return NotFound("Unknown server");
+			}
+			var folder = _settings.GetBackupFolder(server.Id);
+			if (!Directory.Exists(folder))
+			{
+				return new List<BackupInfo>();
+			}
+			var files = Directory.EnumerateFiles(folder);
+			return files.Select(f =>
+			{
+				var fileInfo = new FileInfo(f);
+				return new BackupInfo
+				{
+					Name = fileInfo.Name,
+					Size = (int)fileInfo.Length
+				};
+			}).ToList();
 		}
 	}
 }

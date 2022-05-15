@@ -246,7 +246,7 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		public async void Restore(string fileName)
+		public async Task Restore(string filePath)
 		{
 			AppendActionLineToLog("Starting restore...");
 			try
@@ -255,7 +255,7 @@ namespace MinecraftServerManager.Minecraft
 				var newArchive = new MemoryStream();
 				using (var writer = WriterFactory.Open(newArchive, ArchiveType.Tar, CompressionType.GZip))
 				{
-					using (var reader = ReaderFactory.Open(File.OpenRead(fileName)))
+					using (var reader = ReaderFactory.Open(File.OpenRead(filePath)))
 					{
 						while (reader.MoveToNextEntry())
 						{

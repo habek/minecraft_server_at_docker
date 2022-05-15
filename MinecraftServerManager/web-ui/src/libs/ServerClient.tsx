@@ -41,6 +41,10 @@ class ServerInfo {
 class ServersInfo {
 	[serverId: string]: ServerInfo
 }
+class BackupInfo {
+	name: string | undefined
+	size: number | undefined
+}
 
 class ServerProxy extends events.EventEmitter {
 
@@ -176,7 +180,7 @@ class ServerProxy extends events.EventEmitter {
 
 	async DoBackup(serverId: string) {
 		try {
-			var response = await fetch(`/api/GameServer/Actions/DoBackup/${encodeURIComponent(serverId)}`, { method: "GET" })
+			var response = await fetch(`/api/GameServer/Actions/Backup/${encodeURIComponent(serverId)}`, { method: "GET" })
 			if (!response.ok) {
 				toast.error(JSON.stringify(response.statusText))
 			}
@@ -187,9 +191,23 @@ class ServerProxy extends events.EventEmitter {
 			return []
 		}
 	}
+
+	async GetBackups(serverId: string): Promise<BackupInfo[]> {
+		try {
+			const response = await fetch(`/api/GameServer/${encodeURIComponent(serverId)}/backups`, { method: "GET" });
+			if (!response.ok) {
+				toast.error(response.statusText)
+			}
+			return await (response.json() as unknown as Promise<BackupInfo[]>)
+		} catch (err) {
+			console.error(err);
+			toast.error(JSON.stringify(err))
+			return []
+		}
+	}
 }
 
 const ServerClient = new ServerProxy("/api/events");
 
 export default ServerClient;
-export { ChangedDataType, UserInfo }
+export { ChangedDataType, UserInfo, BackupInfo }

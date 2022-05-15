@@ -23,9 +23,18 @@ namespace MinecraftServerManager
 			File.WriteAllText(SettingsFilePath, JsonConvert.SerializeObject(this, Formatting.Indented));
 		}
 
-		public string GetBackupFilePath(string name)
+		public string GetBackupFolder(string serverId)
 		{
-			return Path.Join(BackupFolder, name, $"backup-{DateTime.Now.ToString("yy-dd-MM-HH-mm-ss")}.tar.gz");
+			return Path.Join(BackupFolder, serverId);
+		}
+
+		public string GetBackupFilePath(string serverId, string backupName)
+		{
+			return Path.Join(GetBackupFolder(serverId), backupName);
+		}
+		public string GetBackupFilePath(string serverId)
+		{
+			return Path.Join(GetBackupFolder(serverId), $"backup-{DateTime.Now.ToString("yy-MM-dd-HH-mm-ss")}.tar.gz");
 		}
 	}
 }
