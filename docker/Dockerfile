@@ -31,4 +31,4 @@ ENV BEDROCK_IN_DOCKER_RESTART_TIME_UTC="03:00"
 WORKDIR /bedrock
 USER root
 EXPOSE 19132/udp 19133/udp
-ENTRYPOINT /scripts/update.sh && /bedrock/bedrock_server
+ENTRYPOINT /scripts/startup.sh

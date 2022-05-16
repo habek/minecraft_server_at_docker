@@ -38,7 +38,7 @@ function ServerUsers() {
 		</td>
 	</tr>));
 	return (
-		<Table>
+		<Table striped size="sm">
 			<thead>
 				<tr>
 					<th>

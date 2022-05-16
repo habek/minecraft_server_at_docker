@@ -94,7 +94,7 @@ namespace web_api.Controllers
 			await server.Backup(_settings.GetBackupFilePath(server.Id));
 			return Ok();
 		}
-		[HttpGet("Actions/Restore/{serverId}/{backupName}")]
+		[HttpGet("{serverId}/restore/{backupName}")]
 		public async Task<ActionResult> Restore(string serverId, string backupName)
 		{
 			var server = GetServer(serverId);

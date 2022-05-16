@@ -189,7 +189,8 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task Start()
 		{
-			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			AppendActionLineToLog("Starting server");
+			CancellationTokenSource cancellationTokenSource = new();
 			var cancellationToken = cancellationTokenSource.Token;
 			await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters { }, cancellationToken);
 			do
@@ -248,10 +249,9 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task Restore(string filePath)
 		{
-			AppendActionLineToLog("Starting restore...");
+			AppendActionLineToLog($"Starting restore '{filePath}'...");
 			try
 			{
-
 				var newArchive = new MemoryStream();
 				using (var writer = WriterFactory.Open(newArchive, ArchiveType.Tar, CompressionType.GZip))
 				{
@@ -278,13 +278,12 @@ namespace MinecraftServerManager.Minecraft
 				await Stop();
 				try
 				{
-
-
 					using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 					cancellationTokenSource.CancelAfter(60000);
 					var cancellationToken = cancellationTokenSource.Token;
 					newArchive.Position = 0;
 					await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = worldFolderOnContainer }, newArchive);
+					AppendActionLineToLog("Restore backup completed.");
 				}
 				finally
 				{

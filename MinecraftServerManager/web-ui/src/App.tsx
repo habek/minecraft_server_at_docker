@@ -1,5 +1,5 @@
 ﻿import './App.css';
-import { Button, Col, Container, Navbar, NavbarBrand, NavbarText, NavbarToggler, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'reactstrap';
+import { Button, Col, Collapse, Container, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarText, NavbarToggler, NavItem, NavLink, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, UncontrolledDropdown } from 'reactstrap';
 import { ServersList } from './components/ServersList';
 import { ServerLogs } from './components/ServerLogs';
 import { ServerUsers } from './components/ServerUsers';
@@ -10,24 +10,51 @@ import { ToastContainer } from 'react-toastify';
 import { ServerBackupsList } from './components/ServerBackupsList';
 
 function App() {
-	const [isServerListOpen, setIsServerListOpen] = useState(false)
 	const serverId = useSelectedGameServerName()
 	return (
 		<div className="App">
 			<Container fluid="true">
-				<Offcanvas isOpen={isServerListOpen} backdrop={false} scrollable={true}>
-					<OffcanvasHeader toggle={() => setIsServerListOpen(false)}>
-						Minecraft servers
-					</OffcanvasHeader>
-					<OffcanvasBody>
-						<ServersList />
-					</OffcanvasBody>
-				</Offcanvas>
-				<Navbar color="light" light expand="md">
-					<NavbarBrand onClick={() => setIsServerListOpen(true)}>
-						{serverId}
-					</NavbarBrand>
-					<ServerBackupButton />
+				<Navbar
+					color="light"
+					expand="md"
+					light
+				>
+					{/*<NavbarBrand href="/">*/}
+					{/*	reactstrap*/}
+					{/*</NavbarBrand>*/}
+					{/*<NavbarToggler onClick={function noRefCheck() { }} />*/}
+					<Collapse navbar>
+						<Nav
+							className="me-auto"
+							navbar
+						>
+							{/*<NavItem>*/}
+							{/*	<NavLink href="/components/">*/}
+							{/*		Components*/}
+							{/*	</NavLink>*/}
+							{/*</NavItem>*/}
+							{/*<NavItem>*/}
+							{/*	<NavLink href="https://github.com/reactstrap/reactstrap">*/}
+							{/*		GitHub*/}
+							{/*	</NavLink>*/}
+							{/*</NavItem>*/}
+							<UncontrolledDropdown
+								inNavbar
+								nav
+							>
+								<DropdownToggle
+									caret
+									nav
+								>
+									{serverId}
+								</DropdownToggle>
+								<ServersList />
+							</UncontrolledDropdown>
+						</Nav>
+						<NavbarText>
+							<ServerBackupButton />
+						</NavbarText>
+					</Collapse>
 				</Navbar>
 				<Row>
 					{/*<Col xs="2"><ServersList /></Col>*/}
@@ -42,7 +69,7 @@ function App() {
 				</Row>
 				<Row>
 					<Col>
-						<ServerBackupsList/>
+						<ServerBackupsList />
 					</Col>
 				</Row>
 			</Container>

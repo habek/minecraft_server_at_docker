@@ -178,6 +178,20 @@ class ServerProxy extends events.EventEmitter {
 		}
 	}
 
+	async handleApiCall(input: RequestInfo, init?: RequestInit): Promise<Response | undefined> {
+		try {
+			var response = await fetch(input, init)
+			if (!response.ok) {
+				toast.error(JSON.stringify(response.statusText))
+			}
+		}
+		catch (err) {
+			console.error(err);
+			toast.error(JSON.stringify(err))
+			return undefined
+		}
+	}
+
 	async DoBackup(serverId: string) {
 		try {
 			var response = await fetch(`/api/GameServer/Actions/Backup/${encodeURIComponent(serverId)}`, { method: "GET" })
@@ -190,6 +204,10 @@ class ServerProxy extends events.EventEmitter {
 			toast.error(JSON.stringify(err))
 			return []
 		}
+	}
+
+	async RestoreBackup(serverId: string, backupName: string) {
+		await this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/restore/${backupName}`, { method: "GET" })
 	}
 
 	async GetBackups(serverId: string): Promise<BackupInfo[]> {

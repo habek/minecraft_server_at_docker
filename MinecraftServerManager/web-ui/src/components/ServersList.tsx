@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Badge, ListGroup, ListGroupItem } from "reactstrap";
+import { Badge, DropdownItem, DropdownMenu, ListGroup, ListGroupItem } from "reactstrap";
 import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
 
 
@@ -31,13 +31,13 @@ function ServersList() {
 	const selectedServer = useSelectedGameServerName()
 	const allServerNames = useAllServerNames()
 	return (
-		<ListGroup>
+		<DropdownMenu end>
 			{allServerNames.map(serverName => (
-				<ListGroupItem active={selectedServer === serverName} key={serverName} tag="button" action className="floatRight" >
+				<DropdownItem active={selectedServer === serverName} key={serverName} tag="button" action="true" className="floatRight" >
 					<ServerButton serverName={serverName} />
-				</ListGroupItem>
+				</DropdownItem>
 			))}
-		</ListGroup>
+		</DropdownMenu>
 	);
 };
 
