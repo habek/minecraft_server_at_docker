@@ -4,6 +4,7 @@ using MinecraftServerManager.Minecraft.Users;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.AspNetCore;
+using System.Reflection;
 using web_api.Background;
 using web_api.Hubs;
 
@@ -14,11 +15,11 @@ Log.Logger = new LoggerConfiguration()
 	.CreateLogger();
 Console.WriteLine("Welcome in Minecraft manager");
 
-var settingsPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath ?? Environment.CurrentDirectory)!, "Settings.json");
+var settingsPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../Settings.json");
 SettingsModel settings = new();
 if (!File.Exists(settingsPath))
 {
-	settingsPath = Path.Combine(Environment.ProcessPath ?? Environment.CurrentDirectory, "../data/Settings.json");
+	settingsPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../../data/Settings.json");
 }
 if (File.Exists(settingsPath))
 {
