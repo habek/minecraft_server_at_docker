@@ -11,9 +11,9 @@ public class Program
 	public static void Main(string[] args)
 	{
 		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-		var settingsPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath ?? Environment.CurrentDirectory)!, "Settings.json");
 		try
 		{
+			var settingsPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath ?? Environment.CurrentDirectory)!, "Settings.json");
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console()
 				.WriteTo.File("logFile.log")
@@ -23,10 +23,19 @@ public class Program
 			Log.Information("###### Start ######");
 			try
 			{
+				if (!File.Exists(settingsPath))
+				{
+					settingsPath = Path.Combine(Environment.ProcessPath ?? Environment.CurrentDirectory, "../data/Settings.json");
+				}
 				if (File.Exists(settingsPath))
 				{
+					Log.Logger.Information($"Loading settings from '{settingsPath}'");
 					var json = File.ReadAllText(settingsPath);
 					Settings = JsonConvert.DeserializeObject<SettingsModel>(json);
+				}
+				else
+				{
+					throw new Exception($"Setting file not found '{settingsPath}'");
 				}
 			}
 			catch (Exception ex)

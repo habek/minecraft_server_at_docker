@@ -2,22 +2,41 @@ using MinecraftServerManager;
 using MinecraftServerManager.Minecraft;
 using MinecraftServerManager.Minecraft.Users;
 using Newtonsoft.Json;
+using Serilog;
+using Serilog.AspNetCore;
 using web_api.Background;
 using web_api.Hubs;
 
+Log.Logger = new LoggerConfiguration()
+	.WriteTo.Console()
+	.WriteTo.File("logFile.log")
+	.WriteTo.Debug()
+	.CreateLogger();
+Console.WriteLine("Welcome in Minecraft manager");
+
 var settingsPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath ?? Environment.CurrentDirectory)!, "Settings.json");
 SettingsModel settings = new();
+if (!File.Exists(settingsPath))
+{
+	settingsPath = Path.Combine(Environment.ProcessPath ?? Environment.CurrentDirectory, "../data/Settings.json");
+}
 if (File.Exists(settingsPath))
 {
 	var json = File.ReadAllText(settingsPath);
+	Log.Logger.Information($"Loading settings from '{settingsPath}'");
 	settings = JsonConvert.DeserializeObject<SettingsModel>(json) ?? settings;
 }
+else
+{
+	throw new Exception($"Setting file not found '{settingsPath}'");
+}
+
 settings.SettingsFilePath = settingsPath;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog(Log.Logger);
 
 // Add services to the container.
-
 builder.Services.AddSingleton(settings);
 builder.Services.AddSingleton<MinecraftUsersManager>();
 builder.Services.AddSingleton<ServersManager>();
