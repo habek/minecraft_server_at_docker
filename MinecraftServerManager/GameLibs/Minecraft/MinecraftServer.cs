@@ -267,7 +267,7 @@ namespace MinecraftServerManager.Minecraft
 								const string worlds = "worlds/";
 								if (destPath.StartsWith(worlds))
 								{
-									destPath = destPath[worlds.Length..];
+									destPath = destPath[worlds.Length..].Replace("Bedrock level", "backup_restore");
 								}
 								memoryStream.Position = 0;
 								writer.Write(destPath, memoryStream, reader.Entry.LastModifiedTime);
