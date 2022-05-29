@@ -22,6 +22,7 @@ if (!File.Exists(settingsPath))
 }
 if (File.Exists(settingsPath))
 {
+	settingsPath = Path.GetFullPath(settingsPath);
 	var json = File.ReadAllText(settingsPath);
 	Log.Logger.Information($"Loading settings from '{settingsPath}'");
 	settings = JsonConvert.DeserializeObject<SettingsModel>(json) ?? settings;
