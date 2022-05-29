@@ -1,12 +1,14 @@
 #!/bin/bash
-cd /app/web-ui 
-# node node_modules/serve/bin/serve.js &
+cd /app/web-proxy
+node server.js &
+sleep 2
 
+cd /app/web-ui 
+node node_modules/serve/bin/serve.js &
+
+sleep 2
 cd /app/web-api
 chmod +x web-api
-# ls -la
-# dotnet --info
+export ASPNETCORE_URLS=http://localhost:5054
 dotnet web-api.dll
 
-cd /app/web-proxy
-node server.js

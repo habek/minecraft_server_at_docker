@@ -14,5 +14,5 @@ RUN npm --version
 WORKDIR /app
 COPY docker_manager/start.sh /app/
 COPY publish /app/
-EXPOSE 3000
+EXPOSE 1337
 ENTRYPOINT [ "/app/start.sh" ]

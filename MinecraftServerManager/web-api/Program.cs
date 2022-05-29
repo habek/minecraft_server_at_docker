@@ -3,14 +3,13 @@ using MinecraftServerManager.Minecraft;
 using MinecraftServerManager.Minecraft.Users;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.AspNetCore;
 using System.Reflection;
 using web_api.Background;
 using web_api.Hubs;
 
 Log.Logger = new LoggerConfiguration()
 	.WriteTo.Console()
-	.WriteTo.File("logFile.log")
+	//.WriteTo.File("logFile.log")
 	.WriteTo.Debug()
 	.CreateLogger();
 Console.WriteLine("Welcome in Minecraft manager");
