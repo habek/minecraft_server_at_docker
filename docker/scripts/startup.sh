@@ -4,4 +4,4 @@ if [ -d "/bedrock/worlds/backup_restore" ]; then
     mv -v "/bedrock/worlds/backup_restore" "/bedrock/worlds/Bedrock level"
 fi
 # /scripts/update.sh
-/bedrock/bedrock_serverx
+/bedrock/bedrock_server
