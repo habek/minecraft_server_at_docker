@@ -4,7 +4,8 @@ node server.js &
 sleep 2
 
 cd /app/web-ui 
-node node_modules/serve/bin/serve.js &
+# node node_modules/serve/bin/serve.js &
+npx serve &
 
 sleep 2
 cd /app/web-api
