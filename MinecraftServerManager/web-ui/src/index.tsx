@@ -18,7 +18,7 @@ root.render(
 					<Route path="*" element={<p>There's nothing here!</p>} />
 				</Route>
 
-				<Route path="*" element={<Redirect destination="/servers/ala" />} />
+				<Route path="*" element={<Redirect destination="/servers" />} />
 			</Routes>
 		</BrowserRouter>
 	</React.StrictMode>
