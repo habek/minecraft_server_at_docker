@@ -15,7 +15,7 @@ root.render(
 			<Routes>
 				<Route path="/servers" element={<App />}>
 					<Route path=":serverId" element={<App />} />
-					<Route path="*" element={<p>There's nothing here!</p>}/>
+					<Route path="*" element={<p>There's nothing here!</p>} />
 				</Route>
 
 				<Route path="*" element={<Redirect destination="/servers/ala" />} />
@@ -28,6 +28,7 @@ interface RedirectProps {
 	destination: string
 }
 function Redirect(props: RedirectProps) {
+	console.info(`Redirecting to ${props.destination}`)
 	const navigate = useNavigate();
 	useEffect(() => {
 		navigate(props.destination)

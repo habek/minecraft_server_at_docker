@@ -3,14 +3,30 @@ import { Button, Col, Collapse, Container, DropdownItem, DropdownMenu, DropdownT
 import { ServersList } from './components/ServersList';
 import { ServerLogs } from './components/ServerLogs';
 import { ServerUsers } from './components/ServerUsers';
-import { useState } from 'react';
-import { useSelectedGameServerName } from './hooks/gameServersHooks';
+import { useEffect, useState } from 'react';
+import { useAllServerNames, useSelectedGameServerName } from './hooks/gameServersHooks';
 import { ServerBackupButton } from './components/ServerButtons';
 import { ToastContainer } from 'react-toastify';
 import { ServerBackupsList } from './components/ServerBackupsList';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function App() {
 	const serverId = useSelectedGameServerName()
+	const params = useParams()
+	const allServers = useAllServerNames();
+	const navigate = useNavigate();
+	useEffect(() => {
+		if (!serverId) {
+			const defaultServer = allServers.length > 0 ? allServers[0] : null;
+			console.info(`Default server: ${defaultServer}`)
+			if (!!defaultServer) {
+				const defaultUrl = `${encodeURIComponent(defaultServer)}`;
+				let serverName = params.serverId;
+				console.warn(`Invalid server id: ${serverName}, navigating to first server on list: ${defaultUrl}`)
+				navigate(defaultUrl)
+			}
+		}
+	});
 	return (
 		<div className="App">
 			<Container fluid="true">
