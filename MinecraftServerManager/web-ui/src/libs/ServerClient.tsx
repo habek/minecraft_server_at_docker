@@ -1,5 +1,4 @@
 import { HubConnection, IRetryPolicy, RetryContext } from "@microsoft/signalr";
-import { off } from "process";
 import { toast } from "react-toastify";
 
 const events = require('events');
@@ -130,6 +129,7 @@ class ServerProxy extends events.EventEmitter {
 		}
 	}
 	subscribeLogs(serverName: string, action: (line: string) => void) {
+		console.info(`Start subscribing for ${serverName}`);
 		if (!serverName) {
 			return;
 		}
@@ -140,6 +140,7 @@ class ServerProxy extends events.EventEmitter {
 		this.registerConsoleEvents(false)
 	}
 	unsubscribeLogs(serverName: string, action: (line: string) => void) {
+		console.info(`Stop subscribing for ${serverName}`);
 		if (!logListeners[serverName]) {
 			return;
 		}
@@ -159,7 +160,12 @@ class ServerProxy extends events.EventEmitter {
 	}
 	async GetUsers(serverId: string): Promise<UserInfo[]> {
 		try {
-			const response = await fetch(`/api/GameServer/Users/${encodeURIComponent(serverId)}`, { method: "GET" });
+			const getUsersPath = `/api/GameServer/Users/${encodeURIComponent(serverId)}`;
+			const response = await fetch(getUsersPath, { method: "GET" });
+			if (response.status > 200) {
+				console.warn(`Call to ${getUsersPath} returned ${response.status} ${response.statusText}`)
+				return [];
+			}
 			var userInfos = await (response.json() as unknown as Promise<UserInfo[]>)
 			var activeUsersNumber = 0;
 			for (var user of userInfos) {

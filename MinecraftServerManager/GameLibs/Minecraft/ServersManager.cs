@@ -21,16 +21,19 @@ namespace MinecraftServerManager.Minecraft
 			await _dockerHost.RefreshContainerList();
 			foreach (var container in _dockerHost.GetContainerList())
 			{
-				var serverId = MinecraftServer.GetServerIdFromContainer(container);
+				if (container.Image.Contains("tchorwat/bedrock-in-docker") || (container.Image.Contains("habek/minecraft_server_at_docker") && !container.Image.Contains("manager")))
+				{
+					var serverId = MinecraftServer.GetServerIdFromContainer(container);
 
-				if (!_minecraftServers.TryGetValue(serverId, out MinecraftServer? server))
-				{
-					server = new MinecraftServer(_minecraftUsersManager, _dockerHost, container);
-					_minecraftServers[serverId] = server;
-				}
-				else
-				{
-					server.UpdateContainer(container);
+					if (!_minecraftServers.TryGetValue(serverId, out MinecraftServer? server))
+					{
+						server = new MinecraftServer(_minecraftUsersManager, _dockerHost, container);
+						_minecraftServers[serverId] = server;
+					}
+					else
+					{
+						server.UpdateContainer(container);
+					}
 				}
 			}
 			OnServerListChanged?.Invoke();
