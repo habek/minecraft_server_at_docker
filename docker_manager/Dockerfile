@@ -1,6 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 ENV NODE_VERSION=16.13.0
 RUN apt update
+RUN apt install tzdata -y
+ENV TZ="Europe/Warsaw"
+
+
 RUN apt install -y curl
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
