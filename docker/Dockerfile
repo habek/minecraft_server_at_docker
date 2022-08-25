@@ -12,6 +12,9 @@ RUN apt-get update \
     wget \
   && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get install tzdata -y
+ENV TZ="Europe/Warsaw"
+
 # Copy projects scripts
 COPY ./scripts /scripts
 
