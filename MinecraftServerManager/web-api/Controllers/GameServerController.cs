@@ -124,7 +124,9 @@ namespace web_api.Controllers
 			{
 				return new List<BackupInfo>();
 			}
-			var files = Directory.EnumerateFiles(folder);
+			var files = Directory.EnumerateFiles(folder).ToList();
+			files.Sort();
+			files.Reverse();
 			return files.Select(f =>
 			{
 				var fileInfo = new FileInfo(f);
