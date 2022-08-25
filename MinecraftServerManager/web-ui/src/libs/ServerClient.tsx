@@ -114,7 +114,10 @@ class ServerProxy extends events.EventEmitter {
 				}
 			}
 			if (!subscribedServerNames.includes(serverName)) {
-				this.signalrConnection.stream("ReadConsole", serverName).subscribe({
+				if(this.subscription){
+					this.subscription.dispose();
+				}
+				this.subscription = this.signalrConnection.stream("ReadConsole", serverName).subscribe({
 					next: (line: string) => {
 						console.debug(`console ${serverName}, line: ${line}`);
 						logListeners[serverName].forEach((subscriber: (arg0: string) => any) => subscriber(line))

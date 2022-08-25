@@ -28,13 +28,13 @@ function ServerConsoleLogStream(props: object) {
 	const logDest = useRef<any>(null);
 
 	useEffect(() => {
+		logDest.current.innerHTML = '';
 		const handler = (line: string) => {
-			console.debug(`console line: ${line}`);
 			const el = document.createElement('div')
 			el.className = "text-start"
 			el.innerHTML = line;
 			var added = logDest.current?.appendChild(el);
-			console.info(added);
+			// console.info(added);
 			added.scrollIntoView()
 		}
 		ServerClient.subscribeLogs(serverName as string, handler);

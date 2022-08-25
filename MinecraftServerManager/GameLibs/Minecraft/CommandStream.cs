@@ -10,14 +10,16 @@ namespace MinecraftServerManager.Minecraft
 	public class CommandStream : IDisposable
 	{
 		private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private readonly CancellationTokenSource _linkedTokenSource;
 		private MultiplexedStream _stream;
 		private MemoryStream _stdin;
 		private MemoryStream _stdout;
 		private MemoryStream _stderr;
 		private int _readPosition;
 
-		public CommandStream(MultiplexedStream stream)
+		public CommandStream(MultiplexedStream stream, CancellationToken cancellationToken)
 		{
+			_linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 			_stream = stream;
 			_stdin = new MemoryStream();
 			_stdout = new MemoryStream();
@@ -38,7 +40,7 @@ namespace MinecraftServerManager.Minecraft
 		internal async Task WriteLine(string line)
 		{
 			var buffer = Encoding.UTF8.GetBytes(line + MinecraftServer.LineSeparator);
-			await _stream.WriteAsync(buffer, 0, buffer.Length, _cancellationTokenSource.Token);
+			await _stream.WriteAsync(buffer, 0, buffer.Length, _linkedTokenSource.Token);
 		}
 
 		internal async Task<string> ReadLine()
@@ -50,7 +52,7 @@ namespace MinecraftServerManager.Minecraft
 			{
 				if (_readPosition >= _stdout.Length)
 				{
-					var readResult = await _stream.ReadOutputAsync(buffer, 0, buffer.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
+					var readResult = await _stream.ReadOutputAsync(buffer, 0, buffer.Length, _linkedTokenSource.Token).ConfigureAwait(false);
 					if (readResult.EOF)
 					{
 						break;

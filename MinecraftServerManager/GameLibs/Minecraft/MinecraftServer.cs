@@ -347,7 +347,14 @@ namespace MinecraftServerManager.Minecraft
 			}
 			catch (Exception ex)
 			{
-				AppendActionLineToLog("Backup error: " + ex.Message);
+				if (ex is TaskCanceledException)
+				{
+					AppendActionLineToLog("Backup timeout");
+				}
+				else
+				{
+					AppendActionLineToLog("Backup error: " + ex.Message);
+				}
 				Log.Error(ex, "Backup error");
 			}
 		}
@@ -453,7 +460,7 @@ namespace MinecraftServerManager.Minecraft
 			CancellationTokenSource cancellationTokenSource = new();
 			cancellationTokenSource.CancelAfter(5000);
 			var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationTokenSource.Token).ConfigureAwait(false);
-			return new CommandStream(stream);
+			return new CommandStream(stream, cancellationTokenSource.Token);
 		}
 
 		public async Task UpdateUsersList()
