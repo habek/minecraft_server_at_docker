@@ -24,7 +24,9 @@ namespace MinecraftServerManager.Minecraft
 		public const string MinecraftRootFolder = "/bedrock";
 		public const string PropertiesFileName = "server.properties";
 		public const string PropertiesPathOnContainer = MinecraftRootFolder + "/" + PropertiesFileName;
-		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
+		public const string PermissionsFileName = "permissions.json";
+		public const string PermissionsPathOnContainer = MinecraftRootFolder + "/" + PermissionsFileName;
+
 		public const string FolderForRestore = "/backup_to_restore";
 		private readonly List<string> _logs = new List<string>();
 		private CancellationTokenSource _logsTaskCancelationTokenSource;
@@ -335,6 +337,7 @@ namespace MinecraftServerManager.Minecraft
 						var filesList = await stream.ReadLine();
 						var filesForBackup = filesList.Split(", ").Select(path => "worlds/" + path.Split(":")[0]).ToList();
 						filesForBackup.Add(PropertiesFileName);
+						filesForBackup.Add(PermissionsFileName);
 						await CreateBackup(filesForBackup, destinationPath);
 						AppendActionLineToLog("Files: " + filesList);
 					}
