@@ -264,7 +264,7 @@ namespace MinecraftServerManager.Minecraft
 							{
 								var memoryStream = new MemoryStream();
 								reader.WriteEntryTo(memoryStream);
-								var destPath = reader.Entry.Key;
+								var destPath = FolderForRestore + "/" + reader.Entry.Key;
 								//const string worlds = "worlds/";
 								//if (destPath.StartsWith(worlds))
 								//{
@@ -276,15 +276,15 @@ namespace MinecraftServerManager.Minecraft
 						}
 					}
 				}
-				await Stop();
+				using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+				cancellationTokenSource.CancelAfter(60000);
+				var cancellationToken = cancellationTokenSource.Token;
+				newArchive.Position = 0;
+				await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = "/" }, newArchive);
+				AppendActionLineToLog("Restore backup completed.");
 				try
 				{
-					using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-					cancellationTokenSource.CancelAfter(60000);
-					var cancellationToken = cancellationTokenSource.Token;
-					newArchive.Position = 0;
-					await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = FolderForRestore }, newArchive);
-					AppendActionLineToLog("Restore backup completed.");
+					await Stop();
 				}
 				finally
 				{
