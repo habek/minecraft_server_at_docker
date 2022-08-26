@@ -24,6 +24,7 @@ namespace MinecraftServerManager.Minecraft
 		public const string PropertiesPathOnContainer = "/bedrock/server.properties";
 		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
 		public const string worldFolderOnContainer = "/bedrock/worlds";
+		public const string FolderForRestore = "/backup_to_restore";
 		private readonly List<string> _logs = new List<string>();
 		private CancellationTokenSource _logsTaskCancelationTokenSource;
 		private readonly MemoryStream _logBuffer = new MemoryStream();
@@ -264,11 +265,11 @@ namespace MinecraftServerManager.Minecraft
 								var memoryStream = new MemoryStream();
 								reader.WriteEntryTo(memoryStream);
 								var destPath = reader.Entry.Key;
-								const string worlds = "worlds/";
-								if (destPath.StartsWith(worlds))
-								{
-									destPath = destPath[worlds.Length..].Replace("Bedrock level", "backup_restore");
-								}
+								//const string worlds = "worlds/";
+								//if (destPath.StartsWith(worlds))
+								//{
+								//	destPath = destPath[worlds.Length..].Replace("Bedrock level", "backup_restore");
+								//}
 								memoryStream.Position = 0;
 								writer.Write(destPath, memoryStream, reader.Entry.LastModifiedTime);
 							}
@@ -282,7 +283,7 @@ namespace MinecraftServerManager.Minecraft
 					cancellationTokenSource.CancelAfter(60000);
 					var cancellationToken = cancellationTokenSource.Token;
 					newArchive.Position = 0;
-					await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = worldFolderOnContainer }, newArchive);
+					await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = FolderForRestore }, newArchive);
 					AppendActionLineToLog("Restore backup completed.");
 				}
 				finally
@@ -366,6 +367,8 @@ namespace MinecraftServerManager.Minecraft
 			var tarStream = new MemoryStream();
 			using (var writer = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.GZip))
 			{
+				var propertiesFile = await GetFile(PropertiesPathOnContainer);
+				writer.Write($"worlds/{Path.GetFileName(PropertiesPathOnContainer)}", new MemoryStream(propertiesFile.Content), propertiesFile.ModificationTime);
 				foreach (var relativePath in filesForBackup)
 				{
 					var fileData = await GetFile($"{worldFolderOnContainer}/{relativePath}");
