@@ -307,9 +307,6 @@ namespace MinecraftServerManager.Minecraft
 		public async Task Backup(string destinationPath)
 		{
 			AppendActionLineToLog("Starting backup...");
-			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-			cancellationTokenSource.CancelAfter(10000);
-			var cancellationToken = cancellationTokenSource.Token;
 			try
 			{
 				using (var stream = await Attach())
@@ -457,8 +454,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task<CommandStream> Attach()
 		{
-			CancellationTokenSource cancellationTokenSource = new();
-			cancellationTokenSource.CancelAfter(5000);
+			CancellationTokenSource cancellationTokenSource = new(60000);
 			var stream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _ttyEnabled, new ContainerAttachParameters { Stream = true, Stdout = true, Stderr = true, Stdin = true }, cancellationTokenSource.Token).ConfigureAwait(false);
 			return new CommandStream(stream, cancellationTokenSource.Token);
 		}

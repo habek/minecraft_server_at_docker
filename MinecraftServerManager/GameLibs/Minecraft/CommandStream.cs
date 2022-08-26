@@ -9,7 +9,7 @@ namespace MinecraftServerManager.Minecraft
 {
 	public class CommandStream : IDisposable
 	{
-		private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private readonly CancellationTokenSource _cancellationTokenSource = new();
 		private readonly CancellationTokenSource _linkedTokenSource;
 		private MultiplexedStream _stream;
 		private MemoryStream _stdin;
@@ -43,8 +43,9 @@ namespace MinecraftServerManager.Minecraft
 			await _stream.WriteAsync(buffer, 0, buffer.Length, _linkedTokenSource.Token);
 		}
 
-		internal async Task<string> ReadLine()
+		internal async Task<string> ReadLine(int timeout = 10000)
 		{
+			var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_linkedTokenSource.Token, new CancellationTokenSource(timeout).Token);
 			var start = _readPosition;
 			var buffer = new byte[1024];
 			bool lineEndFound = false;
@@ -52,7 +53,7 @@ namespace MinecraftServerManager.Minecraft
 			{
 				if (_readPosition >= _stdout.Length)
 				{
-					var readResult = await _stream.ReadOutputAsync(buffer, 0, buffer.Length, _linkedTokenSource.Token).ConfigureAwait(false);
+					var readResult = await _stream.ReadOutputAsync(buffer, 0, buffer.Length, linkedToken.Token).ConfigureAwait(false);
 					if (readResult.EOF)
 					{
 						break;
@@ -80,7 +81,7 @@ namespace MinecraftServerManager.Minecraft
 		{
 			await WriteLine(cmd);
 			var confirm = await ReadLine();
-			if(confirm!= cmd)
+			if (confirm != cmd)
 			{
 				throw new Exception("Server does not echo command");
 			}
