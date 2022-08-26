@@ -21,9 +21,10 @@ namespace MinecraftServerManager.Minecraft
 {
 	public class MinecraftServer
 	{
-		public const string PropertiesPathOnContainer = "/bedrock/server.properties";
+		public const string MinecraftRootFolder = "/bedrock";
+		public const string PropertiesFileName = "server.properties";
+		public const string PropertiesPathOnContainer = MinecraftRootFolder + "/" + PropertiesFileName;
 		public const string PermissionsPathOnContainer = "/bedrock/permissions.json";
-		public const string worldFolderOnContainer = "/bedrock/worlds";
 		public const string FolderForRestore = "/backup_to_restore";
 		private readonly List<string> _logs = new List<string>();
 		private CancellationTokenSource _logsTaskCancelationTokenSource;
@@ -332,7 +333,8 @@ namespace MinecraftServerManager.Minecraft
 							}
 						}
 						var filesList = await stream.ReadLine();
-						var filesForBackup = filesList.Split(", ").Select(path => path.Split(":")[0]).ToList();
+						var filesForBackup = filesList.Split(", ").Select(path => "worlds/" + path.Split(":")[0]).ToList();
+						filesForBackup.Add(PropertiesFileName);
 						await CreateBackup(filesForBackup, destinationPath);
 						AppendActionLineToLog("Files: " + filesList);
 					}
@@ -367,12 +369,10 @@ namespace MinecraftServerManager.Minecraft
 			var tarStream = new MemoryStream();
 			using (var writer = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.GZip))
 			{
-				var propertiesFile = await GetFile(PropertiesPathOnContainer);
-				writer.Write($"worlds/{Path.GetFileName(PropertiesPathOnContainer)}", new MemoryStream(propertiesFile.Content), propertiesFile.ModificationTime);
 				foreach (var relativePath in filesForBackup)
 				{
-					var fileData = await GetFile($"{worldFolderOnContainer}/{relativePath}");
-					writer.Write($"worlds/{relativePath}", new MemoryStream(fileData.Content), fileData.ModificationTime);
+					var fileData = await GetFile($"{MinecraftRootFolder}/{relativePath}");
+					writer.Write(relativePath, new MemoryStream(fileData.Content), fileData.ModificationTime);
 				}
 			}
 			await File.WriteAllBytesAsync(destinationPath, tarStream.ToArray());
