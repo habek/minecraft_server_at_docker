@@ -5,17 +5,13 @@ using MinecraftServerManager.Communication.Docker;
 using MinecraftServerManager.Minecraft.Users;
 using Newtonsoft.Json;
 using Serilog;
-using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 using SharpCompress.Writers;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace MinecraftServerManager.Minecraft
 {
@@ -29,7 +25,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public const string FolderForRestore = "/backup_to_restore";
 		private readonly List<string> _logs = new List<string>();
-		private CancellationTokenSource _logsTaskCancelationTokenSource;
+		private CancellationTokenSource _consoleStreamCancelationTokenSource;
 		private readonly MemoryStream _logBuffer = new MemoryStream();
 		private ConcurrentDictionary<string, MinecraftUser> _connectedUsers = new();
 		private readonly DockerClient _dockerClient;
@@ -52,8 +48,8 @@ namespace MinecraftServerManager.Minecraft
 			_containerId = container.ID;
 			State = container.State;
 			Status = container.Status;
-			_logsTaskCancelationTokenSource = new CancellationTokenSource();
-			_ = ConnectAsync(_logsTaskCancelationTokenSource.Token);
+			_consoleStreamCancelationTokenSource = new CancellationTokenSource();
+			_ = ConnectAsync();
 			_minecraftUsersManager = minecraftUsersManager;
 		}
 
@@ -63,10 +59,9 @@ namespace MinecraftServerManager.Minecraft
 			{
 				return;
 			}
+			AppendActionLineToLog($"Container id changed: {_containerId} -> {container.ID}");
 			_containerId = container.ID;
-			_logsTaskCancelationTokenSource.Cancel();
-			_logsTaskCancelationTokenSource = new CancellationTokenSource();
-			_ = ConnectAsync(_logsTaskCancelationTokenSource.Token);
+			_consoleStreamCancelationTokenSource.Cancel();
 		}
 
 		public static string GetServerIdFromContainer(ContainerListResponse container)
@@ -135,10 +130,18 @@ namespace MinecraftServerManager.Minecraft
 			}
 		}
 
-		public async Task ConnectAsync(CancellationToken cancellationToken)
+		public async Task ConnectAsync()
 		{
-			while (!cancellationToken.IsCancellationRequested)
+			while (true)
 			{
+				CancellationToken cancellationToken = _consoleStreamCancelationTokenSource.Token;
+				if (cancellationToken.IsCancellationRequested)
+				{
+					var cancellationTokenSource = new CancellationTokenSource();
+					cancellationToken = cancellationTokenSource.Token;
+					_consoleStreamCancelationTokenSource = cancellationTokenSource;
+				}
+
 				try
 				{
 					await RefreshContainerState(cancellationToken);
@@ -148,7 +151,7 @@ namespace MinecraftServerManager.Minecraft
 						var linuxTimestamp = DateTimeOffset.Parse(_timestamp);
 						since = linuxTimestamp.ToUnixTimeSeconds().ToString();
 					}
-					var stream = await _dockerClient.Containers.GetContainerLogsAsync(_containerId, _ttyEnabled, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, Since = since }, cancellationToken);
+					using var stream = await _dockerClient.Containers.GetContainerLogsAsync(_containerId, _ttyEnabled, new ContainerLogsParameters { Timestamps = true, Follow = true, ShowStderr = true, ShowStdout = true, Since = since }, cancellationToken);
 					byte[] buffer = new byte[1024];
 
 					while (!cancellationToken.IsCancellationRequested)
@@ -164,11 +167,6 @@ namespace MinecraftServerManager.Minecraft
 						}
 						if (readResult.EOF)
 						{
-							do
-							{
-								await Task.Delay(1000, cancellationToken);
-								await RefreshContainerState(cancellationToken);
-							} while (!_isRunning);
 							break;
 						}
 					}
@@ -176,8 +174,8 @@ namespace MinecraftServerManager.Minecraft
 				catch (Exception ex)
 				{
 					Log.Error(ex.Message);
-					await Task.Delay(1000, cancellationToken);
 				}
+				await Task.Delay(1000);
 			}
 		}
 
@@ -188,7 +186,16 @@ namespace MinecraftServerManager.Minecraft
 				return;
 			}
 			State = newState;
-			OnDataChanged?.Invoke(this, ChangedData.State);
+			try
+			{
+				OnDataChanged?.Invoke(this, ChangedData.State);
+			}
+			catch(Exception ex)
+			{
+				AppendActionLineToLog("Update state exception: " + ex.Message);
+				Log.Error(ex, "Update state exception");
+				
+			}
 		}
 
 		public async Task Start()
@@ -206,8 +213,7 @@ namespace MinecraftServerManager.Minecraft
 		public async Task Stop()
 		{
 			AppendActionLineToLog("Stopping...");
-			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-			cancellationTokenSource.CancelAfter(10000);
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(10000);
 			try
 			{
 				await SendCommand("stop", cancellationTokenSource.Token);
@@ -279,9 +285,6 @@ namespace MinecraftServerManager.Minecraft
 						}
 					}
 				}
-				using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-				cancellationTokenSource.CancelAfter(60000);
-				var cancellationToken = cancellationTokenSource.Token;
 				newArchive.Position = 0;
 				await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = "/" }, newArchive);
 				AppendActionLineToLog("Restore backup completed.");
