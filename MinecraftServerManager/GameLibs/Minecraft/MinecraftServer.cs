@@ -259,7 +259,7 @@ namespace MinecraftServerManager.Minecraft
 
 		public async Task Restore(string filePath)
 		{
-			AppendActionLineToLog($"Starting restore '{filePath}'...");
+			AppendActionLineToLog($"Extracting backup files from '{filePath}'...");
 			try
 			{
 				var newArchive = new MemoryStream();
@@ -287,7 +287,7 @@ namespace MinecraftServerManager.Minecraft
 				}
 				newArchive.Position = 0;
 				await _dockerClient.Containers.ExtractArchiveToContainerAsync(_containerId, new ContainerPathStatParameters { Path = "/" }, newArchive);
-				AppendActionLineToLog("Restore backup completed.");
+				AppendActionLineToLog("Backup files extracted, restarting server...");
 				try
 				{
 					await Stop();
