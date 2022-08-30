@@ -219,9 +219,13 @@ class ServerProxy extends events.EventEmitter {
 	}
 
 	async RestoreBackup(serverId: string, backupName: string) {
-		toast.info(`Starting backup restore from ${backupName}`)
-		await this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/restore/${backupName}`, { method: "GET" })
-		toast.info('Restore completed')
+		var promise = this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/restore/${backupName}`, { method: "GET" });
+		toast.promise(promise,
+			{
+				pending: `Restoring backup from ${backupName}`,
+				success: 'Restore completed',
+				error: 'Restore failed'
+			})
 	}
 
 	async GetBackups(serverId: string): Promise<BackupInfo[]> {
