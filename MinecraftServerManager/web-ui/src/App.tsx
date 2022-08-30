@@ -1,11 +1,9 @@
 ﻿import './App.css';
-import { Col, Collapse, Container, DropdownToggle, Nav, Navbar, NavbarText, Row, UncontrolledDropdown } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import { ServerLogs } from './components/ServerLogs';
 import { ServerUsers } from './components/ServerUsers';
 import { useEffect } from 'react';
 import { useAllServerNames, useSelectedGameServerName } from './hooks/gameServersHooks';
-import { ServerBackupButton } from './components/ServerButtons';
-import { ToastContainer } from 'react-toastify';
 import { ServerBackupsList } from './components/ServerBackupsList';
 import { Link, useParams } from 'react-router-dom';
 import { routeServersIndex } from './routes/routesList';
@@ -33,28 +31,24 @@ function App() {
 	}
 	return (
 		<Layout>
-			<div className="App">
-				<Container fluid="true">
-					<Row>
-						{/*<Col xs="2"><ServersList /></Col>*/}
-						<Col xs="10">
-							<ServerUsers />
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<ServerLogs />
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<ServerBackupsList />
-						</Col>
-					</Row>
-				</Container>
-				<ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
-
-			</div>
+			<Container fluid="true">
+				<Row>
+					{/*<Col xs="2"><ServersList /></Col>*/}
+					<Col xs="10">
+						<ServerUsers />
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<ServerLogs />
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<ServerBackupsList />
+					</Col>
+				</Row>
+			</Container>
 		</Layout>
 	);
 }

@@ -1,7 +1,9 @@
 import { FC, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Badge, Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
+import { ToastContainer } from "react-toastify";
+import { Badge, Button, Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
 import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
+import ServerClient from "../libs/ServerClient";
 import { routeToServer } from "../routes/routesList";
 
 type Props = {
@@ -54,13 +56,26 @@ export function Layout({ children }: Props) {
                                 Actions
                             </DropdownToggle>
                             <DropdownMenu end>
-                                <DropdownItem>Backup...</DropdownItem>
+                                <DropdownItem><ServerBackupButton /></DropdownItem>
                             </DropdownMenu>
                         </UncontrolledDropdown>
                     </Nav>
                 </Collapse>
             </Navbar>
             {children}
+            <ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
+        </div>
+    )
+}
+
+function ServerBackupButton() {
+    const serverId = useSelectedGameServerName()
+    function doBackup() {
+        ServerClient.DoBackup(serverId)
+    }
+
+    return (
+        <div onClick={doBackup}>Backup
         </div>
     )
 }
