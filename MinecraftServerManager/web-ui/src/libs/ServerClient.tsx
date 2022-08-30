@@ -202,20 +202,14 @@ class ServerProxy extends events.EventEmitter {
 	}
 
 	async DoBackup(serverId: string) {
-		toast.info("Starting backup...")
-		try {
-			var response = await fetch(`/api/GameServer/Actions/Backup/${encodeURIComponent(serverId)}`, { method: "GET" })
-			if (!response.ok) {
-				toast.error(JSON.stringify(response.statusText))
-			} else {
-				toast.info("Backup finished")
-			}
-		}
-		catch (err) {
-			console.error(err);
-			toast.error(JSON.stringify(err))
-			return []
-		}
+		const promise = this.handleApiCall(`/api/GameServer/Actions/Backup/${encodeURIComponent(serverId)}`, { method: "GET" });
+		toast.promise(promise,
+			{
+				pending: `Doing backup of ${serverId}`,
+				success: 'Backup completed',
+				error: 'Backup failed'
+			})
+		await promise;
 	}
 
 	async RestoreBackup(serverId: string, backupName: string) {
@@ -226,6 +220,7 @@ class ServerProxy extends events.EventEmitter {
 				success: 'Restore completed',
 				error: 'Restore failed'
 			})
+		await promise;
 	}
 
 	async GetBackups(serverId: string): Promise<BackupInfo[]> {
