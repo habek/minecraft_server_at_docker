@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Layout } from "../components/Layout";
 import { useAllServerNames } from "../hooks/gameServersHooks";
 import { routeToServer } from "./routesList";
 
@@ -9,7 +10,7 @@ export function ServersList() {
     <div>
       {
         allServerNames.map(serverName => (
-          <div>
+          <div key={"menu" + serverName}>
             <Link to={routeToServer(serverName)}>{serverName}</Link><br></br>
           </div>
         ))
@@ -20,10 +21,12 @@ export function ServersList() {
 
 export default function ServersIndex() {
   return (
-    <main style={{ padding: "1rem 0" }}>
-      <h2>Hosted servers</h2>
-      <ServersList />
-    </main>
+    <Layout>
+      <main style={{ padding: "1rem 0" }}>
+        <h2>Hosted servers</h2>
+        <ServersList />
+      </main>
+    </Layout>
   );
 }
 
