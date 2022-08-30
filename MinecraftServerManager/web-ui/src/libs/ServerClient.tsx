@@ -114,7 +114,7 @@ class ServerProxy extends events.EventEmitter {
 				}
 			}
 			if (!subscribedServerNames.includes(serverName)) {
-				if(this.subscription){
+				if (this.subscription) {
 					this.subscription.dispose();
 				}
 				this.subscription = this.signalrConnection.stream("ReadConsole", serverName).subscribe({
@@ -202,10 +202,13 @@ class ServerProxy extends events.EventEmitter {
 	}
 
 	async DoBackup(serverId: string) {
+		toast.info("Starting backup...")
 		try {
 			var response = await fetch(`/api/GameServer/Actions/Backup/${encodeURIComponent(serverId)}`, { method: "GET" })
 			if (!response.ok) {
 				toast.error(JSON.stringify(response.statusText))
+			} else {
+				toast.info("Backup finished")
 			}
 		}
 		catch (err) {
@@ -216,7 +219,9 @@ class ServerProxy extends events.EventEmitter {
 	}
 
 	async RestoreBackup(serverId: string, backupName: string) {
+		toast.info(`Starting backup restore from ${backupName}`)
 		await this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/restore/${backupName}`, { method: "GET" })
+		toast.info('Restore completed')
 	}
 
 	async GetBackups(serverId: string): Promise<BackupInfo[]> {

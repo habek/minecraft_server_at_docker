@@ -14,19 +14,17 @@ const root = ReactDOM.createRoot(
 );
 root.render(
 	<React.StrictMode>
-		<div className='d-flex flex-column align-items-stretch flex-shrink-0 bg-white' style={{ top: "200px" }}>
-			<BrowserRouter>
-				<Routes>
-					<Route path="/servers/:serverId" element={<App />}>
+		<BrowserRouter>
+			<Routes>
+				<Route path="/servers/:serverId" element={<App />}>
 					<Route path='/servers/:serverId/backups' element={<Backups />} />
-						<Route path='*' element={<p>Backups??</p>} />
-						<Route path="*" element={<p>There's nothing here!</p>} />
-					</Route>
-					<Route path="/servers" element={<ServersIndex />} />
-					<Route path="*" element={<Redirect destination={routeServersIndex} />} />
-				</Routes>
-			</BrowserRouter>
-		</div>
+					<Route path='*' element={<p>Backups??</p>} />
+					<Route path="*" element={<p>There's nothing here!</p>} />
+				</Route>
+				<Route path="/servers" element={<ServersIndex />} />
+				<Route path="*" element={<Redirect destination={routeServersIndex} />} />
+			</Routes>
+		</BrowserRouter>
 	</React.StrictMode>
 );
 

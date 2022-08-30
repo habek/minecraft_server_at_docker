@@ -1,10 +1,11 @@
 import { FC, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import { Badge, Button, Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
+import { toast, ToastContainer } from "react-toastify";
+import { Badge, Button, Collapse, Container, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
 import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
 import ServerClient from "../libs/ServerClient";
 import { routeToServer } from "../routes/routesList";
+import 'react-toastify/dist/ReactToastify.css';
 
 type Props = {
     children?: React.ReactNode;
@@ -18,8 +19,9 @@ export function Layout({ children }: Props) {
 
     return (
         <div>
+            <ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
             <Navbar>
-                <NavbarBrand href="/">Bedrock {selectedServer}</NavbarBrand>
+                <NavbarBrand href="/">Bedrock server "{selectedServer}"</NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav pills>
@@ -57,14 +59,27 @@ export function Layout({ children }: Props) {
                             </DropdownToggle>
                             <DropdownMenu end>
                                 <DropdownItem><ServerBackupButton /></DropdownItem>
+                                <DropdownItem><ShowToastButton /></DropdownItem>
                             </DropdownMenu>
                         </UncontrolledDropdown>
                     </Nav>
                 </Collapse>
             </Navbar>
-            {children}
-            <ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
+            <div>
+                <div className="App">
+                    <Container fluid="true">
+                        {children}
+                    </Container>
+                </div>
+            </div>
         </div>
+    )
+}
+
+function ShowToastButton() {
+    const showToast = () => toast.info('ala')
+    return (
+        <div onClick={showToast}>toast</div>
     )
 }
 
