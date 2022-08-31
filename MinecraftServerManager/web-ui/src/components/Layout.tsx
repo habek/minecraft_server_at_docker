@@ -21,7 +21,20 @@ export function Layout({ children }: Props) {
         <div>
             <ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
             <Navbar>
-                <NavbarBrand href="/">Bedrock server "{selectedServer}"</NavbarBrand>
+                <NavbarBrand>
+                    <UncontrolledDropdown>
+                        <DropdownToggle nav caret>
+                            Bedrock server {selectedServer}
+                        </DropdownToggle>
+                        <DropdownMenu end>
+                            {allServerNames.map(serverName => (
+                                <DropdownItem active={selectedServer === serverName} key={serverName} tag="button" action="true" className="floatRight" >
+                                    <ServerButton serverName={serverName} />
+                                </DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </UncontrolledDropdown>
+                </NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav pills>
@@ -40,19 +53,6 @@ export function Layout({ children }: Props) {
                                 Disabled Link
                             </NavLink>
                         </NavItem>
-                        <UncontrolledDropdown nav inNavbar>
-                            <DropdownToggle nav caret>
-                                Change server
-                            </DropdownToggle>
-                            <DropdownMenu end>
-                                {allServerNames.map(serverName => (
-                                    <DropdownItem active={selectedServer === serverName} key={serverName} tag="button" action="true" className="floatRight" >
-                                        <ServerButton serverName={serverName} />
-                                    </DropdownItem>
-                                ))}
-
-                            </DropdownMenu>
-                        </UncontrolledDropdown>
                         <UncontrolledDropdown nav inNavbar>
                             <DropdownToggle nav caret>
                                 Actions
