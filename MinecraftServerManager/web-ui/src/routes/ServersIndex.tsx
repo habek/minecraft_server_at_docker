@@ -9,7 +9,7 @@ export function ServersList() {
   return (
     <div>
       {
-        allServerNames.map(serverName => (
+        allServerNames?.map(serverName => (
           <div key={"menu" + serverName}>
             <Link to={routeToServer(serverName)}>{serverName}</Link><br></br>
           </div>

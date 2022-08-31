@@ -1,7 +1,7 @@
-import { FC, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import { Badge, Button, Collapse, Container, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
+import { Badge, Collapse, Container, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from "reactstrap";
 import { useAllServerNames, useNumberOfActivePlayers, useSelectedGameServerName } from "../hooks/gameServersHooks";
 import ServerClient from "../libs/ServerClient";
 import { routeToServer } from "../routes/routesList";
@@ -16,6 +16,9 @@ export function Layout({ children }: Props) {
     const toggle = () => setIsOpen(!isOpen);
     const selectedServer = useSelectedGameServerName()
     const allServerNames = useAllServerNames()
+    const navigate = useNavigate();
+    const params = useParams()
+    const serverId = params.serverId
 
     return (
         <div>
@@ -24,11 +27,11 @@ export function Layout({ children }: Props) {
                 <NavbarBrand>
                     <UncontrolledDropdown>
                         <DropdownToggle nav caret>
-                            Bedrock server {selectedServer}
+                            Bedrock server {serverId}
                         </DropdownToggle>
                         <DropdownMenu end>
-                            {allServerNames.map(serverName => (
-                                <DropdownItem active={selectedServer === serverName} key={serverName} tag="button" action="true" className="floatRight" >
+                            {allServerNames?.map(serverName => (
+                                <DropdownItem active={serverId === serverName} key={serverName} tag="button" action="true" className="floatRight" >
                                     <ServerButton serverName={serverName} />
                                 </DropdownItem>
                             ))}
@@ -39,18 +42,23 @@ export function Layout({ children }: Props) {
                 <Collapse isOpen={isOpen} navbar>
                     <Nav pills>
                         <NavItem>
-                            <NavLink href="#">
-                                Permissions
+                            <NavLink href="#" onClick={() => { navigate(routeToServer(selectedServer)) }}>
+                                all
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink active href="#">
+                            <NavLink href="#" onClick={() => { navigate(routeToServer(selectedServer) + "/console") }}>
+                                Console logs
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink href="#" onClick={() => { navigate(routeToServer(selectedServer) + "/users") }}>
+                                Users
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink href="#" onClick={() => { navigate(routeToServer(selectedServer) + "/backups") }}>
                                 Backups
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink disabled href="#"					>
-                                Disabled Link
                             </NavLink>
                         </NavItem>
                         <UncontrolledDropdown nav inNavbar>

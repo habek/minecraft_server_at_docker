@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import ServerClient, { UserInfo } from "../libs/ServerClient";
+import { useParams } from "react-router-dom";
+import ServerClient from "../libs/ServerClient";
 
 function useAllServerNames() {
-	const [serverList, setServerList] = useState<string[]>([]);
+	const [serverList, setServerList] = useState<string[] | null>(null);
 
 	useEffect(() => {
 		setServerList(ServerClient.serverNames)
@@ -22,7 +22,9 @@ function useSelectedGameServerName(): string {
 	const params = useParams()
 	const allServers = useAllServerNames();
 	let serverName = params.serverId;
-
+	if (allServers == null) {
+		return serverName || "";
+	}
 	for (let name of allServers) {
 		if (name === serverName) {
 			return serverName;

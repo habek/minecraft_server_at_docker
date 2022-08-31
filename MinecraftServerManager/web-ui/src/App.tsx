@@ -14,19 +14,19 @@ function App() {
 	const params = useParams()
 	const allServers = useAllServerNames();
 	useEffect(() => {
-		if (!serverId) {
-			// let serverName = params.serverId;
-			const defaultServer = allServers.length > 0 ? allServers[0] : null;
-			console.info(`Default server: ${defaultServer}`)
-			// if (!!defaultServer) {
-			// 	const defaultUrl = `${encodeURIComponent(defaultServer)}`;
-			// 	console.warn(`Invalid server id: ${serverName}, navigating to first server on list: ${defaultUrl}`)
-			// 	navigate(defaultUrl)
-			// }
-			// navigate(routeServersIndex)
-		}
+		// if (!serverId) {
+		// 	// let serverName = params.serverId;
+		// 	const defaultServer = allServers.length > 0 ? allServers[0] : null;
+		// 	console.info(`Default server: ${defaultServer}`)
+		// 	// if (!!defaultServer) {
+		// 	// 	const defaultUrl = `${encodeURIComponent(defaultServer)}`;
+		// 	// 	console.warn(`Invalid server id: ${serverName}, navigating to first server on list: ${defaultUrl}`)
+		// 	// 	navigate(defaultUrl)
+		// 	// }
+		// 	// navigate(routeServersIndex)
+		// }
 	});
-	if (!serverId) {
+	if (!serverId && allServers != null) {
 		return <div><h1>Unknown server: "{params.serverId}"</h1><Link to={routeServersIndex}>Go to servers list</Link> </div>
 	}
 	return (
