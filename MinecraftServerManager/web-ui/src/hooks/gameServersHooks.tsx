@@ -18,6 +18,11 @@ function useAllServerNames() {
 	return serverList;
 }
 
+export function useCurrentServerId(): string | undefined {
+	const params = useParams()
+	return params.serverId;
+}
+
 function useSelectedGameServerName(): string {
 	const params = useParams()
 	const allServers = useAllServerNames();

@@ -111,6 +111,7 @@ namespace web_api.Controllers
 			public string? Name { get; set; }
 			public int Size { get; set; }
 		}
+
 		[HttpGet("{serverId}/backups")]
 		public ActionResult<List<BackupInfo>> ListBackups(string serverId)
 		{
@@ -136,6 +137,19 @@ namespace web_api.Controllers
 					Size = (int)fileInfo.Length
 				};
 			}).ToList();
+		}
+
+		[HttpGet("{serverId}/textfile/{filePath}")]
+		public async Task<ActionResult<string>> GetFile(string serverId, string filePath)
+		{
+			var server = GetServer(serverId);
+			if (server == null)
+			{
+				return NotFound("Uknown server");
+			}
+			filePath = MinecraftServer.MinecraftRootFolder + "/" + filePath;
+			var content = await server.LoadTextFile(filePath);
+			return content;
 		}
 	}
 }

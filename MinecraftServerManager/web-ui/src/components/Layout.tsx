@@ -21,7 +21,7 @@ export function Layout({ children }: Props) {
     const serverId = params.serverId
 
     return (
-        <div>
+        <Container>
             <ToastContainer position="bottom-center" newestOnTop={true} pauseOnFocusLoss={true} />
             <Navbar>
                 <NavbarBrand>
@@ -43,7 +43,7 @@ export function Layout({ children }: Props) {
                     <Nav pills>
                         <NavItem>
                             <NavLink href="#" onClick={() => { navigate(routeToServer(selectedServer)) }}>
-                                all
+                                Info
                             </NavLink>
                         </NavItem>
                         <NavItem>
@@ -80,7 +80,7 @@ export function Layout({ children }: Props) {
                     </Container>
                 </div>
             </div>
-        </div>
+        </Container>
     )
 }
 

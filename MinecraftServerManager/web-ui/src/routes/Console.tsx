@@ -12,13 +12,8 @@ export default function Console() {
     }
     return (
         <Layout>
-            <Container fluid="true">
-                <Row>
-                    <Col>
-                        <ServerLogs />
-                    </Col>
-                </Row>
-            </Container>
+            <h4>Server logs</h4>
+            <ServerLogs />
         </Layout>
     );
 }

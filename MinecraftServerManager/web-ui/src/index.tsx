@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import Backups from './routes/Backups';
@@ -10,6 +9,7 @@ import ServersIndex from './routes/ServersIndex';
 import { routeServersIndex } from './routes/routesList';
 import Users from './routes/Users';
 import Console from './routes/Console';
+import ServerInformation from './routes/ServerInformation';
 
 const root = ReactDOM.createRoot(
 	document.getElementById('root') as HTMLElement
@@ -21,10 +21,7 @@ root.render(
 				<Route path='/servers/:serverId/console' element={<Console />} />
 				<Route path='/servers/:serverId/users' element={<Users />} />
 				<Route path='/servers/:serverId/backups' element={<Backups />} />
-				<Route path="/servers/:serverId" element={<App />}>
-					<Route path='*' element={<p>Backups??</p>} />
-					<Route path="*" element={<p>There's nothing here!</p>} />
-				</Route>
+				<Route path="/servers/:serverId" element={<ServerInformation />}/>
 				<Route path="/servers" element={<ServersIndex />} />
 				<Route path="*" element={<Redirect destination={routeServersIndex} />} />
 			</Routes>

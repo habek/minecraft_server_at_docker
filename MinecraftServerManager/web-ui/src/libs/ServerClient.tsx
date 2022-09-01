@@ -193,6 +193,7 @@ class ServerProxy extends events.EventEmitter {
 			if (!response.ok) {
 				toast.error(JSON.stringify(response.statusText))
 			}
+			return response;
 		}
 		catch (err) {
 			console.error(err);
@@ -235,6 +236,19 @@ class ServerProxy extends events.EventEmitter {
 			toast.error(JSON.stringify(err))
 			return []
 		}
+	}
+
+	async LoadFile(serverId: string, filePath: string): Promise<string | undefined> {
+		var promise = this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/textfile/${filePath}`, { method: "GET" });
+		// toast.promise(promise,
+		// 	{
+		// 		pending: `Loading file ${filePath}`,
+		// 		success: 'Loading completed',
+		// 		error: 'Loading file failed'
+		// 	})
+		let response = (await promise)?.text();
+		let content = await response;
+		return content;
 	}
 }
 

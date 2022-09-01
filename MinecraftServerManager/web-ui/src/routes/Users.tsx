@@ -1,11 +1,11 @@
 import { Layout } from "../components/Layout";
+import { ServerUsers } from "../components/ServerUsers";
 
 export default function Users() {
   return (
     <Layout>
-      <main style={{ padding: "1rem 0" }}>
-        <h2>Users</h2>
-      </main>
+      <h4>Users</h4>
+      <ServerUsers />
     </Layout>
   );
 }
