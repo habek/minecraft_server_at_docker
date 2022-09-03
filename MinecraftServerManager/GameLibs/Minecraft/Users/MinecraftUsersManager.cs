@@ -45,14 +45,9 @@ namespace MinecraftServerManager.Minecraft.Users
 			return _allUsers.Values;
 		}
 
-		internal MinecraftUser GetXboxUserByXuid(string xuid)
+		internal MinecraftUser? GetXboxUserByXuid(string xuid)
 		{
-			var existingUser = _allUsers.FirstOrDefault(keyValue => keyValue.Value.Xuid == xuid).Value;
-			if (existingUser != null)
-			{
-				return existingUser;
-			}
-			return GetXboxUser(xuid);
+			return _allUsers.FirstOrDefault(keyValue => keyValue.Value.Xuid == xuid).Value;
 		}
 	}
 }

@@ -7,15 +7,16 @@ function ServerUsers() {
 	const serverName = useSelectedGameServerName()
 	const [userInfos, setUserInfos] = useState<UserInfo[]>([])
 	useEffect(() => {
-		const getUsers = (userInfos: UserInfo[]) => {
+		const getUsersCallback = (userInfos: UserInfo[]) => {
+			// console.debug("getUsersCallback")
 			setUserInfos(userInfos)
 		}
-		ServerClient.on("UsersDataChanged_" + serverName, getUsers);
+		ServerClient.on("UsersDataChanged_" + serverName, getUsersCallback);
 		if (serverName) {
 			ServerClient.GetUsers(serverName)
 		}
 		return () => {
-			ServerClient.off("UsersDataChanged_" + serverName, getUsers);
+			ServerClient.off("UsersDataChanged_" + serverName, getUsersCallback);
 		}
 
 	}, [serverName])

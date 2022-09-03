@@ -190,11 +190,10 @@ namespace MinecraftServerManager.Minecraft
 			{
 				OnDataChanged?.Invoke(this, ChangedData.State);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				AppendActionLineToLog("Update state exception: " + ex.Message);
 				Log.Error(ex, "Update state exception");
-				
 			}
 		}
 
@@ -665,6 +664,10 @@ namespace MinecraftServerManager.Minecraft
 				else
 				{
 					user = _minecraftUsersManager.GetXboxUserByXuid(xuid);
+					if (user == null)
+					{
+						user = new MinecraftUser() { UserName = xuid, Xuid = xuid };
+					}
 				}
 				var userInfo = new GameUserInfo(user) { IsConnected = isConnected };
 				var permission = permissions.FirstOrDefault(permission => permission.Xuid == xuid);
