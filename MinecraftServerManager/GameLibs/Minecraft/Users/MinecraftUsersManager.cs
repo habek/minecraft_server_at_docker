@@ -5,6 +5,7 @@ namespace MinecraftServerManager.Minecraft.Users
 	public class MinecraftUsersManager
 	{
 		private ConcurrentDictionary<string, MinecraftUser> _allUsers = new();
+		private readonly SettingsModel _settings;
 
 		public MinecraftUsersManager(SettingsModel settings)
 		{
@@ -12,6 +13,7 @@ namespace MinecraftServerManager.Minecraft.Users
 			{
 				_allUsers.TryAdd(user.UserName, user);
 			}
+			_settings = settings;
 		}
 
 		public MinecraftUser GetXboxUser(string userName)
@@ -33,12 +35,24 @@ namespace MinecraftServerManager.Minecraft.Users
 				return false;
 			}
 			user.Xuid = xuid;
+			_settings.UpdateUsers(GetAllUsers().Where(user => user.HasXuid()));
+			_settings.Save();
 			return true;
 		}
 
 		public IEnumerable<MinecraftUser> GetAllUsers()
 		{
 			return _allUsers.Values;
+		}
+
+		internal MinecraftUser GetXboxUserByXuid(string xuid)
+		{
+			var existingUser = _allUsers.FirstOrDefault(keyValue => keyValue.Value.Xuid == xuid).Value;
+			if (existingUser != null)
+			{
+				return existingUser;
+			}
+			return GetXboxUser(xuid);
 		}
 	}
 }

@@ -53,8 +53,6 @@ public class Program
 			{
 				try
 				{
-					Settings.KnownUsers.Clear();
-					Settings.KnownUsers.AddRange(minecraftUsersManager.GetAllUsers().Where(user => user.HasXuid()));
 					Settings.Save();
 				}
 				catch (Exception ex)

@@ -664,7 +664,7 @@ namespace MinecraftServerManager.Minecraft
 				}
 				else
 				{
-					user = new MinecraftUser { UserName = xuid, Xuid = xuid };
+					user = _minecraftUsersManager.GetXboxUserByXuid(xuid);
 				}
 				var userInfo = new GameUserInfo(user) { IsConnected = isConnected };
 				var permission = permissions.FirstOrDefault(permission => permission.Xuid == xuid);
