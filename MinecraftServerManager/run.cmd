@@ -1,7 +1,10 @@
+%~d0
+cd %~dp0
 REM @echo off
 pushd "web-ui"
 call :start "web-ui" npm start
 popd
+timeout 3
 
 pushd "web-proxy"
 call :start "web-proxy" node server.js

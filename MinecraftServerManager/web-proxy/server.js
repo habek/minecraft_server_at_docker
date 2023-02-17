@@ -10,21 +10,30 @@ var port = process.env.PORT || 1337;
 
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-
+const simpleRequestLogger = (proxyServer, options) => {
+    proxyServer.on('proxyReq', (proxyReq, req, res) => {
+        // console.log(`[HPM] [${req.method}] ${req.url}`); // outputs: [HPM] GET /users
+    });
+};
 const app = express();
 
 app.use('/api/',
     createProxyMiddleware({
-        target: 'http://localhost:5054/',
+        pathFilter: '/api',
+        target: 'http://127.0.0.1:5054/',
         changeOrigin: false,
         ws: true,
-        logLevel: 'debug'
+        logLevel: 'debug',
+        logger: console,
+        // plugins:[simpleRequestLogger],
     }));
 app.use('/',
     createProxyMiddleware({
-        target: 'http://localhost:3000/',
+        target: 'http://127.0.0.1:3000/',
         changeOrigin: false,
         logLevel: 'debug',
+        logger: console,
+        // plugins:[simpleRequestLogger],
     }));
 console.info("Starting server at " + port);
 app.listen(port);
