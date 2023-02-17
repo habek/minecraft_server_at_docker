@@ -48,7 +48,7 @@ npm install]]></param>
       <runner id="RUNNER_55" name="web-ui npm install" type="simpleRunner">
         <parameters>
           <param name="script.content"><![CDATA[rem nvm use 16.13.2
-nvm use v18.14.1
+nvm use v%NODE_VERSION%
 npm install]]></param>
           <param name="teamcity.build.workingDir" value="MinecraftServerManager/web-ui" />
           <param name="teamcity.step.mode" value="default" />
