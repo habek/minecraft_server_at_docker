@@ -10,6 +10,7 @@
       <setting-ref ref="RUNNER_52" />
     </disabled-settings>
     <parameters>
+      <param name="NODE_VERSION" value="18.14.1" />
       <param name="docker_repo" value="habek/minecraft_server_at_docker" />
       <param name="env.DOCKER_HOST" value="tcp://192.168.200.11:2375" />
     </parameters>
