@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
-ENV NODE_VERSION=16.13.0
+ENV NODE_VERSION=18.14.1
 RUN apt update
 ENV TZ="Europe/Warsaw"
 
