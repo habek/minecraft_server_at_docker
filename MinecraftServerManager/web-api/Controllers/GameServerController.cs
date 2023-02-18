@@ -83,6 +83,30 @@ namespace web_api.Controllers
 		{
 		}
 
+        [HttpGet("Actions/Stop/{serverId}")]
+        public async Task<ActionResult> Stop(string serverId)
+        {
+            var server = GetServer(serverId);
+            if (server == null)
+            {
+                return NotFound();
+            }
+            await server.Stop();
+            return Ok();
+        }
+
+        [HttpGet("Actions/Start/{serverId}")]
+        public async Task<ActionResult> Start(string serverId)
+        {
+            var server = GetServer(serverId);
+            if (server == null)
+            {
+                return NotFound();
+            }
+			await server.Start();
+            return Ok();
+        }
+        
 		[HttpGet("Actions/Backup/{serverId}")]
 		public async Task<ActionResult> Backup(string serverId)
 		{

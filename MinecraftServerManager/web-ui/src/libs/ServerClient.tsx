@@ -213,6 +213,28 @@ class ServerProxy extends events.EventEmitter {
 		await promise;
 	}
 
+	async DoStart(serverId: string) {
+		const promise = this.handleApiCall(`/api/GameServer/Actions/Start/${encodeURIComponent(serverId)}`, { method: "GET" });
+		toast.promise(promise,
+			{
+				pending: `Starting ${serverId}`,
+				success: 'Started successfully',
+				error: 'Start failed'
+			})
+		await promise;
+	}
+
+	async DoStop(serverId: string) {
+		const promise = this.handleApiCall(`/api/GameServer/Actions/Stop/${encodeURIComponent(serverId)}`, { method: "GET" });
+		toast.promise(promise,
+			{
+				pending: `Stopping ${serverId}`,
+				success: 'Stopped successfully',
+				error: 'Stopping failed'
+			})
+		await promise;
+	}
+
 	async RestoreBackup(serverId: string, backupName: string) {
 		var promise = this.handleApiCall(`/api/GameServer/${encodeURIComponent(serverId)}/restore/${backupName}`, { method: "GET" });
 		toast.promise(promise,

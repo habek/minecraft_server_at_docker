@@ -67,6 +67,8 @@ export function Layout({ children }: Props) {
                             </DropdownToggle>
                             <DropdownMenu end>
                                 <DropdownItem><ServerBackupButton /></DropdownItem>
+                                <DropdownItem><ServerStartButton /></DropdownItem>
+                                <DropdownItem><ServerStopButton /></DropdownItem>
                                 <DropdownItem><ShowToastButton /></DropdownItem>
                             </DropdownMenu>
                         </UncontrolledDropdown>
@@ -99,6 +101,30 @@ function ServerBackupButton() {
 
     return (
         <div onClick={doBackup}>Backup
+        </div>
+    )
+}
+
+function ServerStopButton() {
+    const serverId = useSelectedGameServerName()
+    function doStop() {
+        ServerClient.DoStop(serverId)
+    }
+
+    return (
+        <div onClick={doStop}>Stop
+        </div>
+    )
+}
+
+function ServerStartButton() {
+    const serverId = useSelectedGameServerName()
+    function doStart() {
+        ServerClient.DoStart(serverId)
+    }
+
+    return (
+        <div onClick={doStart}>Start
         </div>
     )
 }
