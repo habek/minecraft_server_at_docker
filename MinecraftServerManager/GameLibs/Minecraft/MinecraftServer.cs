@@ -329,7 +329,7 @@ namespace MinecraftServerManager.Minecraft
                             AppendActionLineToLog("Reading line...");
                             var line = await stream.ReadLine();
                             AppendActionLineToLog($"Line read: '{line}'");
-                            if (line.StartsWith("Data saved."))
+                            if (line.Contains("Data saved."))
                             {
                                 break;
                             }
