@@ -326,6 +326,7 @@ namespace MinecraftServerManager.Minecraft
                         int i = 0;
                         while (true)
                         {
+                            AppendActionLineToLog("Starting backup...");
                             var line = await stream.ReadLine();
                             if (line.StartsWith("Data saved."))
                             {
@@ -337,6 +338,7 @@ namespace MinecraftServerManager.Minecraft
                             }
                         }
                         var filesList = await stream.ReadLine();
+                        AppendActionLineToLog("Reading file list...");
                         //var filesForBackup = filesList.Split(", ").Select(path => "worlds/" + path.Split(":")[0]).ToList();
                         var filesForBackup = new List<string>();
                         filesForBackup.Add(PropertiesFileName);
@@ -572,7 +574,7 @@ namespace MinecraftServerManager.Minecraft
 
         private void AppendActionLineToLog(string message)
         {
-            AppendLineToLog($"**** {message} ****");
+            AppendLineToLog($"{DateTime.UtcNow.ToString("u")} **** {message} ****");
         }
 
         private void AppendLineToLog(string line)
