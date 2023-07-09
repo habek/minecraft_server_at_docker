@@ -326,7 +326,7 @@ namespace MinecraftServerManager.Minecraft
                         int i = 0;
                         while (true)
                         {
-                            var line = await stream.ReadLine(30000);
+                            var line = await stream.ReadLine();
                             if (line.StartsWith("Data saved."))
                             {
                                 break;

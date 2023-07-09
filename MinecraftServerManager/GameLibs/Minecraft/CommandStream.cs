@@ -43,7 +43,7 @@ namespace MinecraftServerManager.Minecraft
 		{
 			var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_linkedTokenSource.Token, new CancellationTokenSource(timeout).Token);
 			var start = _readPosition;
-			var buffer = new byte[1024];
+			var buffer = new byte[1];
 			bool lineEndFound = false;
 			while (!lineEndFound)
 			{
