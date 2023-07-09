@@ -8,9 +8,9 @@ namespace MinecraftServerManager.Minecraft
 		private readonly CancellationTokenSource _cancellationTokenSource = new();
 		private readonly CancellationTokenSource _linkedTokenSource;
 		private MultiplexedStream _stream;
-		private MemoryStream _stdin;
-		private MemoryStream _stdout;
-		private MemoryStream _stderr;
+        private readonly MemoryStream _stdin;
+		private readonly MemoryStream _stdout;
+		private readonly MemoryStream _stderr;
 		private int _readPosition;
 
 		public CommandStream(MultiplexedStream stream, CancellationToken cancellationToken)

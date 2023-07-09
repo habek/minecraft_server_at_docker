@@ -326,8 +326,9 @@ namespace MinecraftServerManager.Minecraft
                         int i = 0;
                         while (true)
                         {
-                            AppendActionLineToLog("Starting backup...");
+                            AppendActionLineToLog("Reading line...");
                             var line = await stream.ReadLine();
+                            AppendActionLineToLog($"Line read: '{line}'");
                             if (line.StartsWith("Data saved."))
                             {
                                 break;
@@ -337,8 +338,9 @@ namespace MinecraftServerManager.Minecraft
                                 throw new Exception("Wait for saving data failed");
                             }
                         }
-                        var filesList = await stream.ReadLine();
                         AppendActionLineToLog("Reading file list...");
+                        var filesList = await stream.ReadLine();
+                        AppendActionLineToLog($"Line read: '{filesList}'");
                         //var filesForBackup = filesList.Split(", ").Select(path => "worlds/" + path.Split(":")[0]).ToList();
                         var filesForBackup = new List<string>();
                         filesForBackup.Add(PropertiesFileName);
@@ -574,7 +576,7 @@ namespace MinecraftServerManager.Minecraft
 
         private void AppendActionLineToLog(string message)
         {
-            AppendLineToLog($"{DateTime.UtcNow.ToString("u")} **** {message} ****");
+            AppendLineToLog($"{DateTime.UtcNow.ToString("yy-MM-dd HH:mm:ss.ffff")} **** {message} ****");
         }
 
         private void AppendLineToLog(string line)
