@@ -8,6 +8,7 @@
     </options>
     <disabled-settings>
       <setting-ref ref="RUNNER_52" />
+      <setting-ref ref="TRIGGER_2" />
     </disabled-settings>
     <parameters>
       <param name="NODE_VERSION" value="18.14.1" />
