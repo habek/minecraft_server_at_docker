@@ -2,7 +2,7 @@ version: '3'
 services:
   oneblock_80:
     restart: always
-    image: tchorwat/bedrock-in-docker:0.1.1
+    image: minecraft_base_image
     environment:
       - BEDROCK_IN_DOCKER_FORCE_RESTORE=0
       - BEDROCK_IN_DOCKER_RESTART_TIME_UTC=05:15
