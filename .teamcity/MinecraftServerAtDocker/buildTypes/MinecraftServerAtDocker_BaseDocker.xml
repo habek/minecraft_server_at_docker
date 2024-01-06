@@ -3,7 +3,9 @@
   <name>base docker</name>
   <description />
   <settings>
-    <parameters />
+    <parameters>
+      <param name="docker_image_name" value="minecraft_base_%build.counter%" />
+    </parameters>
     <build-runners>
       <runner id="DockerCommand" name="" type="DockerCommand">
         <parameters>
