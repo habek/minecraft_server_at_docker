@@ -10,7 +10,7 @@
       <runner id="DockerCommand" name="" type="DockerCommand">
         <parameters>
           <param name="docker.command.type" value="build" />
-          <param name="docker.image.namesAndTags" value="docker_" />
+          <param name="docker.image.namesAndTags" value="%docker_image_name%" />
           <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.path" value="Dockerfile" />
           <param name="dockerfile.source" value="PATH" />
