@@ -77,6 +77,7 @@ npm install serve
       </runner>
       <runner id="RUNNER_53" name="Server Manager Docker build" type="DockerCommand">
         <parameters>
+          <param name="command.args" value="-H %env.DOCKER_HOST%" />
           <param name="docker.command.type" value="build" />
           <param name="docker.image.namesAndTags"><![CDATA[%docker_repo%:latest_manager
 %docker_repo%:%build.number%_manager]]></param>
