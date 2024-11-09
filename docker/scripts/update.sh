@@ -21,6 +21,7 @@ else
         echo "Minecraft Bedrock server is up to date..."
     else
         echo "New version $DownloadFile is available.  Updating Minecraft Bedrock server ..."
+        echo "Downloading $DownloadURL ..."
         rm -f /downloads/*
         wget --no-verbose -O "/downloads/$DownloadFile" "$DownloadURL"
         if [ -f "/bedrock/server.properties" ]
