@@ -8,7 +8,6 @@
     </options>
     <disabled-settings>
       <setting-ref ref="DockerSupport" />
-      <setting-ref ref="RUNNER_49" />
       <setting-ref ref="RUNNER_52" />
       <setting-ref ref="RUNNER_53" />
       <setting-ref ref="RUNNER_61" />
@@ -136,17 +135,6 @@ ENTRYPOINT [ "start.sh" ]]]></param>
           <param name="outputDir" value="publish" />
           <param name="paths" value="MinecraftServerManager/MinecraftServerManager/MinecraftServerManager.csproj" />
           <param name="required.sdk" value="6" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_49" name="minecraft server Docker build" type="DockerCommand">
-        <parameters>
-          <param name="docker.command.type" value="build" />
-          <param name="docker.image.namesAndTags"><![CDATA[%docker_repo%
-%docker_repo%:%build.number%]]></param>
-          <param name="docker.push.remove.image" value="true" />
-          <param name="dockerfile.path" value="docker/Dockerfile" />
-          <param name="dockerfile.source" value="PATH" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
