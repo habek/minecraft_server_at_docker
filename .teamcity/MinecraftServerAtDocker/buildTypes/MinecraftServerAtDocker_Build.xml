@@ -9,7 +9,6 @@
     <disabled-settings>
       <setting-ref ref="DockerSupport" />
       <setting-ref ref="RUNNER_49" />
-      <setting-ref ref="RUNNER_50" />
       <setting-ref ref="RUNNER_52" />
       <setting-ref ref="RUNNER_53" />
       <setting-ref ref="RUNNER_61" />
@@ -147,16 +146,6 @@ ENTRYPOINT [ "start.sh" ]]]></param>
 %docker_repo%:%build.number%]]></param>
           <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.path" value="docker/Dockerfile" />
-          <param name="dockerfile.source" value="PATH" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_50" name="Docker push" type="DockerCommand">
-        <parameters>
-          <param name="docker.command.type" value="push" />
-          <param name="docker.image.namesAndTags"><![CDATA[%docker_repo%
-%docker_repo%:%build.number%]]></param>
-          <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.source" value="PATH" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
