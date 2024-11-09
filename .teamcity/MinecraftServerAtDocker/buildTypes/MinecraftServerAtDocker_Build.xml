@@ -9,7 +9,6 @@
     <disabled-settings>
       <setting-ref ref="DockerSupport" />
       <setting-ref ref="RUNNER_52" />
-      <setting-ref ref="RUNNER_53" />
       <setting-ref ref="TRIGGER_2" />
     </disabled-settings>
     <parameters>
@@ -75,46 +74,6 @@ npm install serve
 #serve -s build]]></param>
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_53" name="Server Manager Docker build" type="DockerCommand">
-        <parameters>
-          <param name="command.args" value="-H %env.DOCKER_HOST%" />
-          <param name="docker.command.type" value="build" />
-          <param name="docker.image.namesAndTags"><![CDATA[%docker_repo%:latest_manager
-%docker_repo%:%build.number%_manager]]></param>
-          <param name="docker.push.remove.image" value="true" />
-          <param name="dockerImage.platform" value="linux" />
-          <param name="dockerfile.content"><![CDATA[# FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-# WORKDIR /app
-# EXPOSE 80
-
-
-
-# FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-# WORKDIR "/web-api"
-# COPY ["web-api.csproj", ""]
-# RUN dotnet restore "./web-api.csproj"
-# COPY . .
-# WORKDIR "/src/."
-# RUN dotnet build "smart-automation.csproj" -c Release -o /app/build
-
-# FROM build AS publish
-# RUN dotnet publish "smart-automation.csproj" -c Release -o /app/publish
-
-# FROM base AS final
-# WORKDIR /app
-# COPY --from=publish /app/publish/ ./
-# ENTRYPOINT ["dotnet", "smart-automation.dll"]
-FROM node:16.15
-WORKDIR /app
-COPY docker_manager/start.sh /app/
-COPY publish /app/
-ENTRYPOINT [ "start.sh" ]]]></param>
-          <param name="dockerfile.contextDir" value="." />
-          <param name="dockerfile.path" value="docker_manager/Dockerfile" />
-          <param name="dockerfile.source" value="PATH" />
-          <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
       <runner id="RUNNER_52" name="Windows app" type="dotnet">
