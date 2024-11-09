@@ -24,6 +24,7 @@ else
         echo "Downloading $DownloadURL ..."
         rm -f /downloads/*
         wget --no-verbose -O "/downloads/$DownloadFile" "$DownloadURL"
+        echo "Downloading finished"
         if [ -f "/bedrock/server.properties" ]
         then
           unzip -q -o "/downloads/$DownloadFile" -x "*server.properties*" "*permissions.json*" "*whitelist.json*" -d /bedrock/
