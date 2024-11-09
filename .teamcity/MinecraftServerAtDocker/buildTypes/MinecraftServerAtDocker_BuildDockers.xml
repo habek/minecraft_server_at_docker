@@ -7,7 +7,6 @@
       <option name="artifactRules" value="publish/**/* =&gt; MinecraftServerManager.zip!MinecraftManager" />
     </options>
     <disabled-settings>
-      <setting-ref ref="RUNNER_52" />
       <setting-ref ref="RUNNER_54" />
       <setting-ref ref="RUNNER_55" />
       <setting-ref ref="RUNNER_56" />
@@ -128,16 +127,6 @@ ENTRYPOINT [ "start.sh" ]]]></param>
 %docker_repo%:%build.number%_manager]]></param>
           <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.source" value="PATH" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_52" name="Windows app" type="dotnet">
-        <parameters>
-          <param name="command" value="publish" />
-          <param name="dotNetCoverage.dotCover.home.path" value="%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%" />
-          <param name="outputDir" value="publish" />
-          <param name="paths" value="MinecraftServerManager/MinecraftServerManager/MinecraftServerManager.csproj" />
-          <param name="required.sdk" value="6" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
