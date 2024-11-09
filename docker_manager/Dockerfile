@@ -15,7 +15,8 @@ RUN npm --version
 
 WORKDIR /app
 COPY docker_manager/start.sh /app/
-RUN chmod +x /app/*.sh && chmod 700 /app/web-ui -R
+RUN chmod +x /app/*.sh
+RUN chmod 700 /app/web-ui -R
 COPY publish /app/
 EXPOSE 1337
 ENTRYPOINT [ "/app/start.sh" ]
