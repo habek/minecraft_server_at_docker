@@ -23,7 +23,7 @@ else
         echo "New version $DownloadFile is available.  Updating Minecraft Bedrock server ..."
         echo "Downloading $DownloadURL ..."
         rm -f /downloads/*
-        wget --no-verbose -O "/downloads/$DownloadFile" "$DownloadURL"
+        wget -O "/downloads/$DownloadFile" "$DownloadURL"
         echo "Downloading finished"
         if [ -f "/bedrock/server.properties" ]
         then
