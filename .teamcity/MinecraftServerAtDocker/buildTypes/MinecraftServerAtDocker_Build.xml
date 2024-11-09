@@ -10,7 +10,6 @@
       <setting-ref ref="DockerSupport" />
       <setting-ref ref="RUNNER_49" />
       <setting-ref ref="RUNNER_50" />
-      <setting-ref ref="RUNNER_51" />
       <setting-ref ref="RUNNER_52" />
       <setting-ref ref="RUNNER_53" />
       <setting-ref ref="RUNNER_61" />
@@ -159,21 +158,6 @@ ENTRYPOINT [ "start.sh" ]]]></param>
 %docker_repo%:%build.number%]]></param>
           <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.source" value="PATH" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_51" name="Docker compose" type="ssh-exec-runner">
-        <parameters>
-          <param name="jetbrains.buildServer.deployer.targetUrl" value="192.168.200.11" />
-          <param name="jetbrains.buildServer.deployer.username" value="root" />
-          <param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" />
-          <param name="jetbrains.buildServer.sshexec.command"><![CDATA[cd /root/bedrock
-export HABEK_VERSION=%build.number%
-# docker-compose down 85_test
-docker-compose up -d --remove-orphans
-docker pull %docker_repo%:latest_manager
-docker pull %docker_repo%:latest]]></param>
-          <param name="secure:jetbrains.buildServer.deployer.password" value="credentialsJSON:d212d607-459c-4389-a3a9-1073229aaac6" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
