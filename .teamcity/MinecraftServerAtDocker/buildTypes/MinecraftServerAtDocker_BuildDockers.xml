@@ -194,6 +194,12 @@ docker pull %docker_repo%:latest]]></param>
         </parameters>
       </extension>
     </build-extensions>
+    <artifact-dependencies>
+      <dependency id="ARTIFACT_DEPENDENCY_4" sourceBuildTypeId="MinecraftServerAtDocker_Build" cleanDestination="false">
+        <revisionRule name="sameChainOrLastFinished" revision="latest.sameChainOrLastFinished" />
+        <artifact sourcePath="MinecraftServerManager.zip!/MinecraftManager" />
+      </dependency>
+    </artifact-dependencies>
     <dependencies>
       <depend-on sourceBuildTypeId="MinecraftServerAtDocker_Build">
         <options>
