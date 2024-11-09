@@ -10,7 +10,6 @@
       <setting-ref ref="DockerSupport" />
       <setting-ref ref="RUNNER_52" />
       <setting-ref ref="RUNNER_53" />
-      <setting-ref ref="RUNNER_61" />
       <setting-ref ref="TRIGGER_2" />
     </disabled-settings>
     <parameters>
@@ -114,16 +113,6 @@ COPY publish /app/
 ENTRYPOINT [ "start.sh" ]]]></param>
           <param name="dockerfile.contextDir" value="." />
           <param name="dockerfile.path" value="docker_manager/Dockerfile" />
-          <param name="dockerfile.source" value="PATH" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="RUNNER_61" name="Server Manager Docker push" type="DockerCommand">
-        <parameters>
-          <param name="docker.command.type" value="push" />
-          <param name="docker.image.namesAndTags"><![CDATA[%docker_repo%:latest_manager
-%docker_repo%:%build.number%_manager]]></param>
-          <param name="docker.push.remove.image" value="true" />
           <param name="dockerfile.source" value="PATH" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
