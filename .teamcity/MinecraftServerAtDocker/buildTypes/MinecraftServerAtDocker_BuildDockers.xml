@@ -13,7 +13,6 @@
       <setting-ref ref="RUNNER_57" />
       <setting-ref ref="RUNNER_58" />
       <setting-ref ref="RUNNER_59" />
-      <setting-ref ref="TRIGGER_2" />
     </disabled-settings>
     <parameters>
       <param name="NODE_VERSION" value="18.14.1" />
