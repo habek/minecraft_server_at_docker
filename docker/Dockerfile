@@ -10,6 +10,8 @@ RUN apt-get update \
     screen \
     unzip \
     wget \
+    jq \
+    curl \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy projects scripts
