@@ -8,11 +8,29 @@ else
       # Use specified version
       DownloadURL="$BEDROCK_DOWNLOAD_URL"
     else
-      # Download server index.html to check latest version
-      wget -U "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" --timeout=30 -O /downloads/version.html https://minecraft.net/en-us/download/server/bedrock/
-      # DownloadURL=$(grep -o 'https://minecraft.azureedge.net/bin-linux/[^"]*' /downloads/version.html)
-      DownloadURL=$(grep -o 'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*' /downloads/version.html)
-      echo "Link found: $DownloadURL"
+      # # Download server index.html to check latest version
+      # wget -U "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" --timeout=30 -O /downloads/version.html https://minecraft.net/en-us/download/server/bedrock/
+      # # DownloadURL=$(grep -o 'https://minecraft.azureedge.net/bin-linux/[^"]*' /downloads/version.html)
+      # DownloadURL=$(grep -o 'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*' /downloads/version.html)
+	  # https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.21.93.1.zip
+      # echo "Link found: $DownloadURL"
+		set -e
+
+		echo "🔍 Fetching latest Bedrock server info..."
+
+		# 1. Query Mojang's JSON API for download links
+		json=$(curl -s https://net-secondary.web.minecraft-services.net/api/v1.0/download/links)
+
+		# 2. Extract URL for Linux Bedrock server
+		DownloadURL=$(echo "$json" | jq -r '.result.links[]
+				 | select(.downloadType=="serverBedrockLinux")
+				 | .downloadUrl')
+
+		if [[ -z "$DownloadURL" || "$DownloadURL" == "null" ]]; then
+		  echo "❌ Could not find Bedrock server download URL. API may have changed."
+		  exit 1
+		fi
+
     fi
     DownloadFile=$(echo "$DownloadURL" | sed 's#.*/##')
 
